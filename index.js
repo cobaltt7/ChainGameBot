@@ -43,8 +43,7 @@
 					client.channels.cache
 						.get("823941821695918121")
 						.send(
-							`@${msg.author.username}#${msg.author.discriminator}\
-							- \`${msg.content}\` is not a valid word!`,
+							`${msg.author} - \`${msg.content}\` is not a word!`,
 						);
 					return;
 				}
