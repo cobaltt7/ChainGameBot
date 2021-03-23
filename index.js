@@ -4,12 +4,10 @@
 
 		const SQL = require("pg").Client;
 		const Database = new SQL({
-			user: process.env.DATABASE_USER,
-			password: process.env.DATABSE_PASSWORD,
-			host: process.env.DATABASE_HOST,
-			port: process.env.DATABASE_PORT,
-			database: process.env.DATABASE_NAME,
-			ssl: true,
+			connectionString: process.env.DATABASE_URL,
+			ssl: {
+				rejectUnauthorized: false,
+			},
 		});
 		await Database.connect();
 		console.log("Connected to Postgres");
