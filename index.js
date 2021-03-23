@@ -8,6 +8,7 @@
 		host: process.env.DATABASE_HOST,
 		port: process.env.DATABASE_PORT,
 		database: process.env.DATABASE_NAME,
+		ssl: true,
 	});
 	await Database.connect();
 	console.log("Connected to Postgres");
