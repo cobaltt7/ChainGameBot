@@ -23,6 +23,7 @@
 	},
 	"homepage": "https://github.com/RedGuy12/ShitoriBot#readme",
 	"dependencies": {
+		"axios": "^0.21.1",
 		"discord.js": "^12.5.1",
 		"dotenv": "^8.2.0",
 		"node-postgres": "^0.6.2",

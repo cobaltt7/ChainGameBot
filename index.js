@@ -2,6 +2,8 @@
 	try {
 		require("dotenv").config();
 
+		const axios = require("axios");
+
 		const SQL = require("pg").Client;
 		const Database = new SQL({
 			connectionString: process.env.DATABASE_URL,
@@ -31,7 +33,21 @@
 
 		client.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				console.log(msg);
+				const url =
+					"https://en.wiktionary.org/w/api.php?action=parse&summary" +
+					"=example&format=json&redirects=true&page=" +
+					msg.content;
+				const response = await axios.get(url);
+				if (!response.data.error) {
+					msg.delete();
+					client.channels.cache
+						.get("823941821695918121")
+						.send(
+							`@${msg.author.username}#${msg.author.discriminator}\
+							- \`${msg.content}\` is not a valid word!`,
+						);
+					return;
+				}
 				try {
 					await Database.query();
 				} catch {}
