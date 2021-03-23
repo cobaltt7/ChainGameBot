@@ -30,11 +30,12 @@
 		});
 
 		client.on("message", async (msg) => {
-			console.log(msg);
-			return;
-			try {
-				await Database.query();
-			} catch {}
+			if (msg.channel.id === "823941849453821982") {
+				console.log(msg);
+				try {
+					await Database.query();
+				} catch {}
+			}
 		});
 
 		client.login(process.env.BOT_TOKEN);
