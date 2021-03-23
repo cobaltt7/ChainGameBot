@@ -36,19 +36,30 @@
 				const url =
 					"https://en.wiktionary.org/w/api.php?action=parse&summary" +
 					"=example&format=json&redirects=true&page=" +
-					msg.content;
+					msg.content.toLowerCase();
 				const response = await axios.get(url);
 				if (response.data.error) {
 					msg.delete();
 					client.channels.cache
 						.get("823941821695918121")
 						.send(
-							`${msg.author} - \`${msg.content}\` is not a word!`,
+							`${msg.author} - \`${msg.content.toLowerCase()}\`` +
+								`is not a word!`,
 						);
 					return;
 				}
 				try {
-					await Database.query();
+					await Database.query(
+						"INSERT INTO words (word, author, id, server, channel" +
+							") VALUES ($1,$2,$3,$4,$5);",
+						[
+							msg.content.toLowerCase(),
+							msg.author.toString(),
+							msg.id,
+							msg.channel.guild.id,
+							msg.channel.id,
+						],
+					);
 				} catch {}
 			}
 		});
