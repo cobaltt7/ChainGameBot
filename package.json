@@ -4,7 +4,7 @@
 	"description": "A Discord bot for the Shitori game",
 	"main": "index.js",
 	"scripts": {
-		"start": "node . --trace-warnings"
+		"start": "node --trace-warnings ."
 	},
 	"repository": {
 		"type": "git",
@@ -27,5 +27,8 @@
 		"dotenv": "^8.2.0",
 		"node-postgres": "^0.6.2",
 		"pg": "^8.5.1"
+	},
+	"devDependencies": {
+		"@types/node": "^14.14.35"
 	}
 }
