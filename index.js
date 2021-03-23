@@ -38,7 +38,7 @@
 					"=example&format=json&redirects=true&page=" +
 					msg.content;
 				const response = await axios.get(url);
-				if (!response.data.error) {
+				if (response.data.error) {
 					msg.delete();
 					client.channels.cache
 						.get("823941821695918121")
