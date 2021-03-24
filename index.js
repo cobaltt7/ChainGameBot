@@ -3,6 +3,7 @@
 		require("dotenv").config();
 
 		const axios = require("axios");
+		console.log(await axios.get("https://httpbin.org/ip"));
 
 		const SQL = require("pg").Client;
 		const Database = new SQL({
