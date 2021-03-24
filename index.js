@@ -11,7 +11,7 @@
 					"https://github.com/RedGuy12/ShitoriBot",
 			},
 		};
-		console.log(await axios.get("https://httpbin.org/ip"));
+		console.log(await axios.get("https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php"));
 
 		const SQL = require("pg").Client;
 		const Database = new SQL({
