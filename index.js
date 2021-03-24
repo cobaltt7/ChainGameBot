@@ -4,7 +4,7 @@
 		const axios = require("axios");
 		const fetch = axios.method;
 		axios.defaults.headers.common["User-Agent"] =
-			"Shirtori Discord Bot by Paul Reid\nA Discord bot to enforce the rules of the Shitori game\n" +
+			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
 			"https://github.com/RedGuy12/ShitoriBot";
 
 		console.log(
