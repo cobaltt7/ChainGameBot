@@ -3,6 +3,14 @@
 		require("dotenv").config();
 
 		const axios = require("axios");
+		const headers = {
+			headers: {
+				"User-Agent":
+					"Shirtori Discord Bot by Paul Reid\n" +
+					"A Discord bot to enforce the rules of the Shitori game" +
+					"https://github.com/RedGuy12/ShitoriBot",
+			},
+		};
 		console.log(await axios.get("https://httpbin.org/ip"));
 
 		const SQL = require("pg").Client;
@@ -38,21 +46,21 @@
 					"https://en.wiktionary.org/w/api.php?action=parse&summary" +
 					"=example&format=json&redirects=true&page=" +
 					msg.content.toLowerCase();
-				const response = await axios.get(url);
+				const response = await axios.get(url, headers);
 				if (response.data.error) {
 					msg.delete();
 					client.channels.cache
 						.get("823941821695918121")
 						.send(
 							`${msg.author} - \`${msg.content.toLowerCase()}\`` +
-								`is not a word!`,
+								"is not a word!",
 						);
 					return;
 				}
 				try {
 					await Database.query(
-						"INSERT INTO words (word, author, id, server, channel" +
-							") VALUES ($1,$2,$3,$4,$5);",
+						"INSERT INTO words (word, author, id, server, channel)\
+						VALUES ($1,$2,$3,$4,$5);",
 						[
 							msg.content.toLowerCase(),
 							msg.author.toString(),
