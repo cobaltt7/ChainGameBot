@@ -1,9 +1,8 @@
 (async function () {
 	try {
 		require("dotenv").config();
-		const axios = require("axios");
-		const fetch = axios.method;
-		axios.defaults.headers.common["User-Agent"] =
+		const fetch = require("axios");
+		fetch.defaults.headers.common["User-Agent"] =
 			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
 			"https://github.com/RedGuy12/ShitoriBot";
 
