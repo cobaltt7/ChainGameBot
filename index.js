@@ -6,6 +6,7 @@
 			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
 			"https://github.com/RedGuy12/ShitoriBot";
 
+			console.log(process.env.API_ACCESS_KEY)
 		console.log(
 			await fetch({
 				url: "https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php",
