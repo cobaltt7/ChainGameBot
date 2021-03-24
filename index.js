@@ -8,8 +8,12 @@
 			"https://github.com/RedGuy12/ShitoriBot";
 
 		console.log(
-			await axios.post("https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php", {
-				API_ACCESS_KEY: process.env.API_ACCESS_KEY,
+			await fetch({
+				url: "https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php",
+				method: "post",
+				data: {
+					API_ACCESS_KEY: process.env.API_ACCESS_KEY,
+				},
 			}),
 		);
 		const Database = function (query, placeholders = []) {
