@@ -4,5 +4,6 @@
 	"trailingComma": "all",
 	"jsxBracketSameLine": true,
 	"vueIndentScriptAndStyle": true,
-	"embeddedLanguageFormatting": "auto"
+	"embeddedLanguageFormatting": "auto",
+	"printWidth": 120
 }
