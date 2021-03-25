@@ -6,7 +6,7 @@
 			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
 			"https://github.com/RedGuy12/ShitoriBot";
 
-		const DatabaseQuery = function (query) {
+		const DatabaseQuery = (query) => {
 			return fetch({
 				url: "https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php",
 				method: "post",
@@ -39,13 +39,8 @@
 						.send(`${msg.author} - \`${msg.content.toLowerCase()}\`` + "is not a word!");
 					return;
 				}
-				var used = await DatabaseQuery(
-					"SELECT `author`, `id`, `channel`, `server` FROM `shitori_words` WHERE `word`='" +
-						escape(msg.content.toLowerCase()) +
-						"'",
-				);
 				await DatabaseQuery(
-					`INSERT INTO words (word, author, id, server, channel) VALUES (${escape(
+					`INSERT INTO shitori_words (word, author, id, server, channel) VALUES (${escape(
 						msg.content.toLowerCase(),
 					)}, ${escape(msg.author.toString())}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)}, ${escape(
 						msg.channel.id,
