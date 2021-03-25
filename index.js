@@ -1,11 +1,15 @@
 (async function () {
 	try {
+		// set up process.env
 		require("dotenv").config();
+
+		// set up axios
 		const fetch = require("axios");
 		fetch.defaults.headers.common["User-Agent"] =
 			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
-			"https://github.com/RedGuy12/ShitoriBot";
+			"https://github.com/RedGuy12/ShitoriBot"; // so Wiktionary won't ban us
 
+		//set up db stuffs
 		const DatabaseQuery = (query) => {
 			return fetch({
 				url: "https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php",
@@ -26,23 +30,36 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
+				var word = msg.content.toLowerCase();
+
+				// use Wiktionary's API to determine if it is a word
 				var response = await fetch({
 					method: "get",
 					url:
 						"https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&" +
-						`page=${msg.content.toLowerCase()}`,
+						`page=${word}`,
 				});
 				if (response.data.error) {
 					msg.delete();
-					Discord.channels.cache
-						.get("823941821695918121")
-						.send(`${msg.author} - \`${msg.content.toLowerCase()}\` is not a word!`);
+					Discord.channels.cache.get("823941821695918121").send(`${msg.author} - \`${word}\` is not a word!`);
 					return;
 				}
+
+				// determine if it starts with the last letter of the previous word
+				var lastWord = (
+					await DatabaseQuery("SELECT `word` FROM `shitori_words` ORDER BY `index` DESC LIMIT 1;")
+				).data["0"].word;
+				if (lastWord.slice(-1) !== word[0]) {
+					msg.delete();
+					Discord.channels.cache
+						.get("823941821695918121")
+						.send(`${msg.author} - \`${word}\` does not start with ${lastWord.slice(-1)}!`);
+					return;
+				}
+
+				// determine if it has been used before
 				var used = await DatabaseQuery(
-					"SELECT `author`, `id`, `channel`, `server` FROM `shitori_words` WHERE `word`='" +
-						msg.content.toLowerCase() +
-						"'",
+					"SELECT `author`, `id`, `channel`, `server` FROM `shitori_words` WHERE `word`='" + word + "'",
 				);
 				if (used.data["0"] !== "{") {
 					// idk why this works but for some reason it does
@@ -50,18 +67,17 @@
 					Discord.channels.cache
 						.get("823941821695918121")
 						.send(
-							`${msg.author} - \`${msg.content.toLowerCase()}\` has been used before by ${
-								used.data["0"].author
-							}! See https://discord.com/channels/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
+							`${msg.author} - \`${word}\` has been used before by ${used.data["0"].author}!\n` +
+								`See https://discord.com/channels/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
 						);
 					return;
 				}
+
+				// all checks out, add to db
 				await DatabaseQuery(
-					`INSERT INTO shitori_words (word, author, id, channel, server) VALUES (${escape(
-						msg.content.toLowerCase(),
-					)}, ${escape(msg.author.username)}, ${escape(msg.id)}, ${escape(msg.channel.id)}, ${escape(
-						msg.channel.guild.id,
-					)});`,
+					`INSERT INTO shitori_words (word, author, id, channel, server) VALUES (${escape(word)}, ${escape(
+						msg.author.username,
+					)}, ${escape(msg.id)}, ${escape(msg.channel.id)}, ${escape(msg.channel.guild.id)});`,
 				);
 			}
 		});
