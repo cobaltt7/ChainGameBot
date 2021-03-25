@@ -30,7 +30,7 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				var word = msg.content.toLowerCase();
+				var word = msg.content.toLowerCase().replaceAll(/\s/ig, "");
 
 				// use Wiktionary's API to determine if it is a word
 				var response = await fetch({
