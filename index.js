@@ -30,7 +30,7 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				var word = msg.content.toLowerCase().replace(/\s/ig, "");
+				var word = msg.content.toLowerCase().replace(/\s/gi, "");
 
 				// use Wiktionary's API to determine if it is a word
 				var response = await fetch({
@@ -58,26 +58,31 @@
 				}
 
 				// determine if it has been used before
-				var used = await DatabaseQuery(
-					"SELECT `author`, `id`, `channel`, `server` FROM `shitori_words` WHERE `word`='" + word + "'",
-				);
-				if (used.data["0"] !== "{") {
+				var used = (
+					await DatabaseQuery(
+						"SELECT `author`, `id`, `guild` FROM `shitori_words` WHERE `word`='" + word + "'",
+					)
+				).data["0"];
+				if (used !== "{") {
 					// idk why this works but for some reason it does
 					msg.delete();
 					Discord.channels.cache
 						.get("823941821695918121")
 						.send(
-							`${msg.author} - \`${word}\` has been used before by ${used.data["0"].author}!\n` +
-								`See https://discord.com/channels/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
+							`${msg.author} - \`${word}\` has been used before by ${
+								used.author
+							}!\nSee https://discord.com/channels/${Discord.channels.cache.get(used.channel).guild.id}/${
+								used.channel
+							}/${used.id}`,
 						);
 					return;
 				}
 
 				// all checks out, add to db
 				await DatabaseQuery(
-					`INSERT INTO shitori_words (word, author, id, channel, server) VALUES (${escape(word)}, ${escape(
+					`INSERT INTO shitori_words (word, author, id, guild) VALUES (${escape(word)}, ${escape(
 						msg.author.username,
-					)}, ${escape(msg.id)}, ${escape(msg.channel.id)}, ${escape(msg.channel.guild.id)});`,
+					)}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)});`,
 				);
 			}
 		});
