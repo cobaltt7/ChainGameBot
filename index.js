@@ -26,7 +26,7 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				const response = await fetch({
+				var response = await fetch({
 					method: "get",
 					url:
 						"https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&" +
@@ -36,14 +36,31 @@
 					msg.delete();
 					Discord.channels.cache
 						.get("823941821695918121")
-						.send(`${msg.author} - \`${msg.content.toLowerCase()}\`` + "is not a word!");
+						.send(`${msg.author} - \`${msg.content.toLowerCase()}\` is not a word!`);
+					return;
+				}
+				var used = await DatabaseQuery(
+					"SELECT `author`, `id`, `channel`, `server` FROM `shitori_words` WHERE `word`='" +
+						msg.content.toLowerCase() +
+						"'",
+				);
+				if (used.data["0"] !== "{") {
+					// idk why this works but for some reason it does
+					msg.delete();
+					Discord.channels.cache
+						.get("823941821695918121")
+						.send(
+							`${msg.author} - \`${msg.content.toLowerCase()}\` has been used before by ${
+								used.data["0"].author
+							}! See https://discord.com/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
+						);
 					return;
 				}
 				await DatabaseQuery(
-					`INSERT INTO shitori_words (word, author, id, server, channel) VALUES (${escape(
+					`INSERT INTO shitori_words (word, author, id, channel, server) VALUES (${escape(
 						msg.content.toLowerCase(),
-					)}, ${escape(msg.author.username)}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)}, ${escape(
-						msg.channel.id,
+					)}, ${escape(msg.author.username)}, ${escape(msg.id)}, ${escape(msg.channel.id)}, ${escape(
+						msg.channel.guild.id,
 					)});`,
 				);
 			}
