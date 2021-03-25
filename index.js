@@ -42,7 +42,7 @@
 				await DatabaseQuery(
 					`INSERT INTO shitori_words (word, author, id, server, channel) VALUES (${escape(
 						msg.content.toLowerCase(),
-					)}, ${escape(msg.author.toString())}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)}, ${escape(
+					)}, ${escape(msg.author.username)}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)}, ${escape(
 						msg.channel.id,
 					)});`,
 				);
