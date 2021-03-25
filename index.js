@@ -30,7 +30,8 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				var word = msg.content.toLowerCase().replaceAll(/\s/ig, "");
+				var word = msg.content.toLowerCase();
+				word = word.replaceAll(/\s/ig, "");
 
 				// use Wiktionary's API to determine if it is a word
 				var response = await fetch({
@@ -48,12 +49,12 @@
 				// determine if it starts with the last letter of the previous word
 				var lastWord = (
 					await DatabaseQuery("SELECT `word` FROM `shitori_words` ORDER BY `index` DESC LIMIT 1;")
-				).data["0"].word;
-				if (lastWord.slice(-1) !== word[0]) {
+				).data["0"];
+				if (lastWord.word.slice(-1) !== word[0]) {
 					msg.delete();
 					Discord.channels.cache
 						.get("823941821695918121")
-						.send(`${msg.author} - \`${word}\` does not start with ${lastWord.slice(-1)}!`);
+						.send(`${msg.author} - \`${word}\` does not start with ${lastWord.word.slice(-1)}!`);
 					return;
 				}
 
