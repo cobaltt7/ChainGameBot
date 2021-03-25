@@ -18,7 +18,8 @@
 		};
 		const { escape } = require("sqlstring");
 
-		const Discord = new require("discord.js").Client();
+		var Discord = require("discord.js");
+		Discord = new Discord.Client();
 		Discord.on("ready", () => {
 			console.log(`Connected to Discord`);
 		});
