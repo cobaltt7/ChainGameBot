@@ -52,7 +52,7 @@
 						.send(
 							`${msg.author} - \`${msg.content.toLowerCase()}\` has been used before by ${
 								used.data["0"].author
-							}! See https://discord.com/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
+							}! See https://discord.com/channels/${msg.channel.guild.id}/${msg.channel.id}/${msg.id}`,
 						);
 					return;
 				}
