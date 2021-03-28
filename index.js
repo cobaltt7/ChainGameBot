@@ -30,7 +30,16 @@
 
 		Discord.on("message", async (msg) => {
 			if (msg.channel.id === "823941849453821982") {
-				var word = msg.content.toLowerCase().replace(/\s/gi, "");
+				var word = msg.content.toLowerCase();
+
+				// don't allow whitespace
+				if (/\s/.test(word)) {
+					msg.delete();
+					Discord.channels.cache
+						.get("823941821695918121")
+						.send(`${msg.author} - \`${word}\` is more than one word!`);
+					return;
+				}
 
 				// use Wiktionary's API to determine if it is a word
 				var response = await fetch({
