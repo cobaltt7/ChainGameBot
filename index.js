@@ -5,9 +5,9 @@
 
 		// set up axios
 		const fetch = require("axios");
-		fetch.defaults.headers.common["User-Agent"] =
-			"Shirtori Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Shitori game // " +
-			"https://github.com/RedGuy12/ShitoriBot"; // so Wiktionary won't ban us
+		fetch.defaults.headers.common["User-Agent"] = // so Wiktionary won't ban us
+			"Word Chain Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Word Chain game // " +
+			"https://github.com/RedGuy12/ShitoriBot";
 
 		//set up db stuffs
 		const DatabaseQuery = (query) => {
@@ -56,7 +56,7 @@
 
 				// determine if it starts with the last letter of the previous word
 				var lastWord = (
-					await DatabaseQuery("SELECT `word` FROM `shitori_words` ORDER BY `index` DESC LIMIT 1;")
+					await DatabaseQuery("SELECT `word` FROM `word_chain_words` ORDER BY `index` DESC LIMIT 1;")
 				).data["0"];
 				if (lastWord.word.slice(-1) !== word[0]) {
 					msg.delete();
@@ -69,7 +69,7 @@
 				// determine if it has been used before
 				var used = (
 					await DatabaseQuery(
-						"SELECT `author`, `id`, `guild` FROM `shitori_words` WHERE `word`='" + word + "'",
+						"SELECT `author`, `id`, `guild` FROM `word_chain_words` WHERE `word`='" + word + "'",
 					)
 				).data["0"];
 				if (used !== "{") {
@@ -89,7 +89,7 @@
 
 				// all checks out, add to db
 				await DatabaseQuery(
-					`INSERT INTO shitori_words (word, author, id, guild) VALUES (${escape(word)}, ${escape(
+					`INSERT INTO word_chain_words (word, author, id, guild) VALUES (${escape(word)}, ${escape(
 						msg.author.username,
 					)}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)});`,
 				);
