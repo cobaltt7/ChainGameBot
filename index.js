@@ -29,19 +29,22 @@
 		});
 
 		Discord.on("guildCreate", (guild) => {
-			guild.channels.forEach(function (channel) {
+			//guild.preferredLocale;
+			guild.channels.cache.some(function (channel) {
 				if (channel.type === "text" && guild.me.permissionsIn(channel).has("SEND_MESSAGES")) {
-					return channel.send(
+					channel.send(
 						"Hi! Thanks for the invite!\n" +
-							"If you haven't already, create two channels:" +
+							"If you haven't already, create two channels: " +
 							"one for playing the game and one for talking about the game.\n" +
 							"After you do that, type `@WordChainBot setup` in the talking-about-the-game channel.",
 					);
+					return true;
 				}
 			});
 		});
 
 		Discord.on("message", async (msg) => {
+			console.log (msg.content)
 			if (msg.channel.id === "823941849453821982") {
 				var word = msg.content.toLowerCase();
 
