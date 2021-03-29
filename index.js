@@ -44,7 +44,7 @@
 		});
 
 		Discord.on("message", async (msg) => {
-			console.log (msg.content)
+			console.log(msg.content);
 			if (msg.channel.id === "823941849453821982") {
 				var word = msg.content.toLowerCase();
 
