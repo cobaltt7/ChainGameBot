@@ -1,6 +1,6 @@
 {
 	"name": "shitori-bot",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "A Discord bot for the Shitori game",
 	"main": "index.js",
 	"scripts": {
@@ -26,12 +26,10 @@
 		"axios": "^0.21.1",
 		"discord.js": "^12.5.1",
 		"dotenv": "^8.2.0",
-		"node-postgres": "^0.6.2",
 		"pg": "^8.5.1",
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {
-		"@types/node": "^14.14.35",
-		"sync-glitch-cli": "^2.0.1"
+		"@types/node": "^14.14.35"
 	}
 }

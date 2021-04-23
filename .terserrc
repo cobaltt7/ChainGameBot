@@ -1,0 +1,33 @@
+{
+	"compress": {
+		"arguments": true,
+		"booleans_as_integers": true,
+		"drop_console": true,
+		"expression": true,
+		"hoist_props": false,
+		"keep_fnames": true,
+		"keep_infinity": true,
+		"passes": 3,
+		"typeofs": false
+	},
+	"mangle": {
+		"eval": true,
+		"keep_classnames": true,
+		"keep_fnames": true,
+		"safari10": true
+	},
+	"sourceMap": {
+		"url": "inline"
+	},
+	"format": {
+		"indent_level": 0,
+		"safari10": true,
+		"webkit": true
+	},
+	"ecma": 8,
+	"keep_classnames": true,
+	"keep_fnames": true,
+	"ie8": true,
+	"safari10": true,
+	"toplevel": false
+}
