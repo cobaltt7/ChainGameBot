@@ -1,1 +1,4 @@
-node_modules
+*.min.*
+!*.min.*.map
+/vendor/
+/node_modules/

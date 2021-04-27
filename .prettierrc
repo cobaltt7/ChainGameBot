@@ -5,5 +5,5 @@
 	"jsxBracketSameLine": true,
 	"vueIndentScriptAndStyle": true,
 	"embeddedLanguageFormatting": "auto",
-	"printWidth": 120
+	"printWidth": 80
 }
