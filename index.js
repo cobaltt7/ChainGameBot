@@ -30,8 +30,13 @@
 	Discord.on("guildCreate", (guild) => {
 		//guild.preferredLocale;
 		guild.channels.cache.some(function (channel) {
-			if (channel.type === "text" && guild.me.permissionsIn(channel).has("SEND_MESSAGES")) {
-				channel.send("Hi! Thanks for the invite!\nTo set me up, type `@WordChainBot setup`.");
+			if (
+				channel.type === "text" &&
+				guild.me.permissionsIn(channel).has("SEND_MESSAGES")
+			) {
+				channel.send(
+					"Hi! Thanks for the invite!\nTo set me up, type `@WordChainBot setup`.",
+				);
 				return true;
 			}
 		});
@@ -66,25 +71,38 @@
 			});
 			if (response.data.error) {
 				msg.delete();
-				Discord.channels.cache.get("823941821695918121").send(`${msg.author} - \`${word}\` is not a word!`);
+				Discord.channels.cache
+					.get("823941821695918121")
+					.send(`${msg.author} - \`${word}\` is not a word!`);
 				return;
 			}
 
 			// determine if it starts with the last letter of the previous word
-			var lastWord = (await DatabaseQuery("SELECT `word` FROM `word_chain_words` ORDER BY `index` DESC LIMIT 1;"))
-				.data["0"];
+			var lastWord = (
+				await DatabaseQuery(
+					"SELECT `word` FROM `word_chain_words` ORDER BY `index` DESC LIMIT 1;",
+				)
+			).data["0"];
 			if (lastWord.word.slice(-1) !== word[0]) {
 				msg.delete();
 				Discord.channels.cache
 					.get("823941821695918121")
-					.send(`${msg.author} - \`${word}\` does not start with ${lastWord.word.slice(-1)}!`);
+					.send(
+						`${
+							msg.author
+						} - \`${word}\` does not start with ${lastWord.word.slice(
+							-1,
+						)}!`,
+					);
 				return;
 			}
 
 			// determine if it has been used before
 			var used = (
 				await DatabaseQuery(
-					"SELECT `author`, `id`, `guild` FROM `word_chain_words` WHERE `word`='" + word + "'",
+					"SELECT `author`, `id`, `guild` FROM `word_chain_words` WHERE `word`='" +
+						word +
+						"'",
 				)
 			).data["0"];
 			if (used !== "{") {
@@ -95,18 +113,20 @@
 					.send(
 						`${msg.author} - \`${word}\` has been used before by ${
 							used.author
-						}!\nSee https: //discord.com/channels/${Discord.channels.cache.get(used.channel).guild.id}/${
-							used.channel
-						}/${used.id}`,
+						}!\nSee https: //discord.com/channels/${
+							Discord.channels.cache.get(used.channel).guild.id
+						}/${used.channel}/${used.id}`,
 					);
 				return;
 			}
 
 			// all checks out, add to db
 			await DatabaseQuery(
-				`INSERT INTO word_chain_words (word, author, id, guild) VALUES (${escape(word)}, ${escape(
-					msg.author.username,
-				)}, ${escape(msg.id)}, ${escape(msg.channel.guild.id)});`,
+				`INSERT INTO word_chain_words (word, author, id, guild) VALUES (${escape(
+					word,
+				)}, ${escape(msg.author.username)}, ${escape(msg.id)}, ${escape(
+					msg.channel.guild.id,
+				)});`,
 			);
 		}
 	});
