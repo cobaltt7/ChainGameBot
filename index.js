@@ -67,7 +67,7 @@
 				method: "get",
 				url:
 					"https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&" +
-					`page =${word}`,
+					`page      =${word}`,
 			});
 			if (response.data.error) {
 				msg.delete();
