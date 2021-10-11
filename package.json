@@ -10,7 +10,7 @@
 		"url": "https://discord.gg/GcwZtqNCGx"
 	},
 	"type": "module",
-	"main": "index.js",
+	"main": "src/index.js",
 	"scripts": {
 		"lint": "npm run lint:prettier && npm run lint:typescript && npm run lint:eslint && echo Success",
 		"lint:eslint": "eslint --fix --cache .",
@@ -21,8 +21,8 @@
 	"dependencies": {
 		"axios": "^0.22.0",
 		"discord.js": "^12.5.1",
-		"dotenv": "^8.2.0",
-		"pg": "^8.5.1",
+		"dotenv": "^10.0.0",
+		"mongoose": "^6.0.10",
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {

@@ -1,9 +1,12 @@
 import dotenv from "dotenv";
 import fetch from "axios";
-import { escape } from "sqlstring";
+import mongoose from "mongoose";
 import discordJs from "discord.js";
+
 // set up process.env
 dotenv.config();
+
+const CHANNELS = {game: "823941849453821982", rules: "823941821695918121"}
 
 // so Wiktionary won't ban us
 fetch.defaults.headers.common["User-Agent"] =
@@ -11,50 +14,46 @@ fetch.defaults.headers.common["User-Agent"] =
 	"https://github.com/RedGuy12/ShitoriBot";
 
 //set up db stuffs
-function sql(querySegments, ...variables) {
-	return fetch({
-		url: "https://paul-s-reid.com/web-dev/ShitoriBotApi-php/index.php",
-		method: "post",
-		data: {
-			API_ACCESS_KEY: process.env.API_ACCESS_KEY,
-			query: variables.reduce((accumulated, variable, index) => {
-				return `${accumulated}${escape(variable)}${querySegments[index + 1]}`;
-			}, querySegments[0]),
+
+await mongoose.connect(`${process.env.MONGO_URL}?retryWrites=true&w=majority`, {
+	appName: "OneAuth",
+});
+mongoose.connection.on("error", console.error);
+
+const Database = mongoose.model(
+	"Shitori",
+	new mongoose.Schema({
+		word: {
+			type:String,required:true,unique:true,lowercase:true,trim:true
+
 		},
-	});
-}
+		author: {
+			type:Number,required:true,
+		},
+		id: {
+			type:Number,unique:true,required:true
+		},
+		index:{
+			type:Number,required:true,unique:true
+		}
+	}),
+);
 
 const Discord = new discordJs.Client();
 Discord.on("ready", () => {
 	console.log(`Connected to Discord`);
 });
 
-Discord.on("guildCreate", (guild) => {
-	//guild.preferredLocale;
-	guild.channels.cache.some(function (channel) {
-		if (channel.type === "text" && guild.me.permissionsIn(channel).has("SEND_MESSAGES")) {
-			channel.send("Hi! Thanks for the invite!\nTo set me up, type `@WordChainBot setup`.");
-			return true;
-		}
-	});
-});
-
 Discord.on("message", async (msg) => {
-	if (msg.content.toLowerCase() === "<@!823932474118635540> setup") {
-		await msg.reply(
-			"Create one channel for playing the game and another for talking about the game.\n" +
-				"Would you like me to create them, or will you?",
-		);
-	}
-
-	if (msg.channel.id === "823941849453821982") {
-		var word = msg.content.toLowerCase();
+	if (msg.channel.id !== CHANNELS.game) return;
+	try {
+		var word = msg.content.toLowerCase().trim();
 
 		// don't allow whitespace
 		if (/\s/.test(word)) {
 			msg.delete();
 			Discord.channels.cache
-				.get("823941821695918121")
+				.get(CHANNELS.rules)
 				.send(`${msg.author} - \`${word}\` is more than one word!`);
 			return;
 		}
@@ -63,53 +62,52 @@ Discord.on("message", async (msg) => {
 		var response = await fetch({
 			method: "get",
 			url:
-				"https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&" +
-				`page=${word}`,
+				`https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`,
 		});
 		if (response.data.error) {
 			msg.delete();
 			Discord.channels.cache
-				.get("823941821695918121")
+				.get(CHANNELS.rules)
 				.send(`${msg.author} - \`${word}\` is not a word!`);
 			return;
 		}
 
 		// determine if it starts with the last letter of the previous word
-		var lastWord = (
-			await sql`SELECT \`word\` FROM \`word_chain_words\` ORDER BY \`index\` DESC LIMIT 1;`
-		).data["0"];
-		if (lastWord.word.slice(-1) !== word[0]) {
+		const lastWord=(await Database.findOne().sort({index:-1}).exec())
+		const shouldStartWith=lastWord?.word.slice(-1)
+		if (shouldStartWith&&shouldStartWith !== word[0]) {
 			msg.delete();
 			Discord.channels.cache
-				.get("823941821695918121")
+				.get(CHANNELS.rules)
 				.send(
-					`${msg.author} - \`${word}\` does not start with ${lastWord.word.slice(-1)}!`,
+					`${msg.author} - \`${word}\` does not start with ${shouldStartWith}!`,
 				);
 			return;
 		}
 
 		// determine if it has been used before
-		var used = (
-			await sql`SELECT \`author\`, \`id\`, \`guild\` FROM \`word_chain_words\` WHERE \`word\`='${word}';`
-		).data["0"];
-		if (used !== "{") {
-			// idk why this works but for some reason it does
+		var used = await Database.findOne({word: word}).exec();
+		if (used) {
 			msg.delete();
 			Discord.channels.cache
-				.get("823941821695918121")
+				.get(CHANNELS.rules)
 				.send(
 					`${msg.author} - \`${word}\` has been used before by ${
 						used.author
 					}!\nSee https: //discord.com/channels/${
-						Discord.channels.cache.get(used.channel).guild.id
+						used.guild
 					}/${used.channel}/${used.id}`,
 				);
 			return;
 		}
 
 		// all checks out, add to db
-		await sql`INSERT INTO word_chain_words (word, author, id, guild) VALUES (${word}, ${msg.author.username}, ${msg.id}, ${msg.channel.guild.id});`;
-	}
+		await new Database({word, author:msg.author.id, id:msg.id, index:(lastWord?.index?? -1)+1}).save();
+	}catch(error){
+		Discord.channels.cache
+			.get(CHANNELS.rules)
+			.send(`Uhoh! I found an error!\n\n\`\`\`js\n${error.message}\`\`\``)
+				}
 });
 
 Discord.login(process.env.BOT_TOKEN);
