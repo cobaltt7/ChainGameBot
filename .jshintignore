@@ -1,4 +1,0 @@
-*.min.*
-!*.min.*.map
-/vendor/
-/node_modules/

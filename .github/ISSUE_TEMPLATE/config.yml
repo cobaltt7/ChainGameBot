@@ -1,0 +1,10 @@
+blank_issues_enabled: false
+
+contact_links:
+    - name: Discord
+      url: "https://discord.gg/GcwZtqNCGx"
+      about: Get support in our Discord server
+
+    - name: Discussions
+      url: https://github.com/RedGuy12/ShitoriBot/discussions/new
+      about: "Chat, ask for help, and share what you've made here"

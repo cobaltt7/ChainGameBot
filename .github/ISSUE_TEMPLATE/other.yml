@@ -1,0 +1,66 @@
+name: Other
+description:
+    Anything else (you probably want to open a discussion instead of an issue; issues are mainly for
+    bugs and feature requests)
+labels: ["status: needs triage"]
+
+body:
+    - type: markdown
+      attributes:
+          value: Thanks for submitting this issue! All feedback is read and considered.
+
+    - type: checkboxes
+      attributes:
+          label: Is there an existing issue for this?
+          description: Please search to see if an issue already exists for this.
+          options:
+              - label: I have searched the existing issues and none does.
+                required: true
+
+    - type: textarea
+      id: what-happened
+      attributes:
+          label: Describe it
+          description: A clear and concise description.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Reasons to do this
+          description: Why this would be good to do.
+          value: This would be good because…
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Alternatives
+          description: A clear and concise description of any alternatives.
+      validations:
+          required: false
+
+    - type: textarea
+      attributes:
+          label: Anything else?
+          description: Put any other related context and/or screenshots here.
+      validations:
+          required: false
+
+    - type: checkboxes
+      attributes:
+          label: Agree to our policies
+          description: By submitting this issue, you agree to follow our policies.
+          options:
+              - label:
+                    I agree to follow the [Code of
+                    Conduct](https://github.com/onedotprojects/auth/blob/issues/.github/CODE_OF_CONDUCT.md).
+                required: true
+
+              - label:
+                    I agree to follow the [Contributing
+                    Guidelines](https://github.com/onedotprojects/auth/blob/issues/.github/CONTRIBUTING.md).
+                required: true
+
+              - label: I am willing to submit a PR to add this (optional).
+                required: false

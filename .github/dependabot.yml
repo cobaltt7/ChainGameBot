@@ -1,0 +1,19 @@
+version: 2
+updates:
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "13:00"
+      labels:
+          - "scope: meta"
+          - "scope: dependencies"
+
+    - package-ecosystem: "npm"
+      directory: "/"
+      schedule:
+          interval: "daily"
+          time: "13:00"
+      labels:
+          - "language: node"
+          - "scope: dependencies"

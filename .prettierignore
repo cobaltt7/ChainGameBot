@@ -1,4 +1,12 @@
-*.min.*
-!*.min.*.map
-/vendor/
-/node_modules/
+!**
+logs
+.git/
+node_modules/
+plugin_packages/
+.npm
+.upm
+.nvm
+.eslintcache
+.node_repl_history
+package-lock.json
+package.json

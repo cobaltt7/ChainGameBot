@@ -1,0 +1,7 @@
+.github/
+.tx/
+.vscode/
+.eslintcache
+.gitignore
+.prettierignore
+Procfile

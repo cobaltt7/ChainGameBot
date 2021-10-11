@@ -1,20 +1,49 @@
-name: Format code using Prettier
-on: [push, pull_request]
+name: Format and lint
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
-    format:
-        runs-on: ubuntu-latest
+    run:
+        name: Lint
+        runs-on: ubuntu-20.04
+
         steps:
-            - uses: actions/checkout@v2
-            - name: Setup Node.js
-              uses: actions/setup-node@v1
+            - name: Checkout
+              uses: actions/checkout@v2.3.4
               with:
-                  node-version: 12.x
-            - name: Install Prettier
-              run: npm install --global prettier
-            - name: Format code
-              run: npx prettier --write .
-            - name: Commit changed files
-              uses: stefanzweifel/git-auto-commit-action@v4
+                  ref: ${{ github.head_ref }}
+                  # token: ${{ secrets.TOKEN || github.token }}
+
+            - name: Setup Node.JS
+              uses: actions/setup-node@v2.4.0
               with:
-                  commit_message: "Format code using Prettier"
+                  node-version: 16
+                  cache: "npm"
+
+            - name: Install
+              run: npm install --force
+
+            - name: Prettier
+              run: npm run lint:prettier
+
+            - name: Typescript
+              if: ${{ !cancelled() }}
+              run: npm run lint:typescript
+
+            - name: ESLint
+              if: ${{ !cancelled() }}
+              run: npm run lint:eslint
+
+            - name: Revert
+              if: ${{ !cancelled() }}
+              run: git checkout HEAD -- package-lock.json package.json
+
+            - name: Commit
+              if: ${{ !cancelled() }}
+              uses: stefanzweifel/git-auto-commit-action@v4.12.0
+              with:
+                  commit_message: "Lint and format code"
+                  branch: ${{ github.head_ref }}
+                  commit_options: "--signoff"
+                  # commit_user_name: wgytbot
+                  # commit_user_email: 83586655+wgytbot@users.noreply.github.com
+                  # commit_author: wgytbot <83586655+wgytbot@users.noreply.github.com>

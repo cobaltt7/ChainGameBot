@@ -1,35 +1,152 @@
 {
-	"name": "shitori-bot",
+	"private": true,
+	"name": "@redguy13/chain-bot",
 	"version": "1.0.0",
-	"description": "A Discord bot for the Shitori game",
+	"description": "A Discord bot for chain games, like Shitori and counting.",
+	"license": "MIT",
+	"author": "Paul Reid",
+	"homepage": "https://github.com/RedGuy12/ShitoriBot#readme",
+	"bugs": {
+		"url": "https://discord.gg/GcwZtqNCGx"
+	},
+	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"start": "node --trace-warnings ."
+		"lint": "npm run lint:prettier && npm run lint:typescript && npm run lint:eslint && echo Success",
+		"lint:eslint": "eslint --fix --cache .",
+		"lint:prettier": "prettier --write --ignore-unknown **",
+		"lint:typescript": "tsc --project jsconfig.json",
+		"start": "node --trace-warnings --harmony ."
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/RedGuy12/ShitoriBot.git"
-	},
-	"keywords": [
-		"discord",
-		"shitori",
-		"bot",
-		"game"
-	],
-	"author": "Paul Reid",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/RedGuy12/ShitoriBot/issues"
-	},
-	"homepage": "https://github.com/RedGuy12/ShitoriBot#readme",
 	"dependencies": {
-		"axios": "^0.21.1",
+		"axios": "^0.22.0",
 		"discord.js": "^12.5.1",
 		"dotenv": "^8.2.0",
 		"pg": "^8.5.1",
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {
-		"@types/node": "^14.14.35"
+		"@onedotprojects/eslint-plugin": "^2.2.1",
+		"@types/node": "16.4.14",
+		"eslint": "^7.32.0",
+		"eslint-config-hardcore": "20.3.0",
+		"eslint-plugin-compat": "^3.12.0",
+		"eslint-plugin-eslint-comments": "^3.2.0",
+		"eslint-plugin-html": "^6.1.2",
+		"eslint-plugin-import": "^2.24.0",
+		"eslint-plugin-jsdoc": "^36.0.8",
+		"eslint-plugin-markdown": "^2.2.0",
+		"eslint-plugin-promise": "^5.1.0",
+		"eslint-plugin-regexp": "^1.0.0",
+		"eslint-plugin-switch-case": "^1.1.2",
+		"eslint-plugin-unicorn": "^35.0.0",
+		"prettier": "^2.4.1",
+		"prettier-plugin-ini": "^0.3.1",
+		"prettier-plugin-jsdoc": "^0.3.24",
+		"typescript": "^4.4.3"
+	},
+	"keywords": [
+		"discord",
+		"shitori",
+		"counting",
+		"chain",
+		"bot",
+		"game"
+	],
+	"engines": {
+		"node": ">=14.15.4"
+	},
+	"prettier": {
+		"iniSpaceAroundEquals": true,
+		"printWidth": 100,
+		"proseWrap": "always",
+		"quoteProps": "consistent",
+		"tabWidth": 4,
+		"trailingComma": "all",
+		"useTabs": true,
+		"jsdocDescriptionWithDot": true,
+		"jsdocPrintWidth": 100,
+		"jsdocSeparateReturnsFromParam": true,
+		"bracketSameLine": false,
+		"vueIndentScriptAndStyle": true,
+		"overrides": [
+			{
+				"files": [
+					"**.md"
+				],
+				"options": {
+					"trailingComma": "es5",
+					"proseWrap": "never",
+					"parser": "markdown"
+				}
+			},
+			{
+				"files": [
+					"**.svg",
+					"**.html",
+					"**.xml"
+				],
+				"options": {
+					"trailingComma": "none",
+					"parser": "html",
+					"bracketSameLine": true
+				}
+			},
+			{
+				"files": [
+					"**.sass",
+					"**.scss",
+					"**.css"
+				],
+				"options": {
+					"parser": "scss"
+				}
+			},
+			{
+				"files": [
+					"**.env",
+					"**.replit",
+					"**/.tx/config"
+				],
+				"options": {
+					"parser": "ini"
+				}
+			},
+			{
+				"files": [
+					"**.json",
+					"**.map"
+				],
+				"options": {
+					"parser": "json"
+				}
+			},
+			{
+				"files": [
+					"**.code-workspace",
+					".code-snippets",
+					"**/settings.json",
+					"**/launch.json",
+					"**/extensions.json",
+					"**.jsonc",
+					"**.eslintrc",
+					"**.eslintrc.json",
+					"jsconfig.json"
+				],
+				"options": {
+					"parser": "json5",
+					"quoteProps": "preserve",
+					"trailingComma": "none"
+				}
+			}
+		],
+		"plugins": [
+			"prettier-plugin-jsdoc",
+			"prettier-plugin-ini"
+		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/RedGuy12/ShitoriBot.git"
 	}
 }

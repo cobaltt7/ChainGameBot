@@ -1,0 +1,63 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: ["status: needs triage", "type: enhancement"]
+
+body:
+    - type: markdown
+      attributes:
+          value: Thanks for putting in your idea! All feedback is appreciated.
+
+    - type: checkboxes
+      attributes:
+          label: Is there an existing issue for this?
+          description: Please search to see if an issue already exists for the bug you encountered.
+          options:
+              - label: I have searched the existing issues and none does.
+                required: true
+
+    - type: textarea
+      attributes:
+          label: Describe the feature
+          description: A clear and concise description of the feature.
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Reasons to add this feature
+          description: Why this feature would be good to add.
+          value: This feature would be good because…
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Alternatives to this feature
+          description: A clear and concise description of any alternative solutions or features.
+      validations:
+          required: false
+
+    - type: textarea
+      attributes:
+          label: Anything else?
+          description: Put any other context and/or screenshots about the feature request here.
+      validations:
+          required: false
+
+    - type: checkboxes
+      attributes:
+          label: Agree to our policies
+          description: By submitting this issue, you agree to follow our policies.
+          options:
+              - label:
+                    I agree to follow the [Code of
+                    Conduct](https://github.com/onedotprojects/auth/blob/issues/.github/CODE_OF_CONDUCT.md).
+                required: true
+
+              - label:
+                    I agree to follow the [Contributing
+                    Guidelines](https://github.com/onedotprojects/auth/blob/issues/.github/CONTRIBUTING.md).
+                required: true
+
+              - label: I am willing to submit a PR to add this (optional).
+                required: false
