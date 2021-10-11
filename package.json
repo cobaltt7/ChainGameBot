@@ -39,7 +39,7 @@
 		"eslint-plugin-promise": "^5.1.0",
 		"eslint-plugin-regexp": "^1.0.0",
 		"eslint-plugin-switch-case": "^1.1.2",
-		"eslint-plugin-unicorn": "^35.0.0",
+		"eslint-plugin-unicorn": "^36.0.0",
 		"prettier": "^2.4.1",
 		"prettier-plugin-ini": "^0.3.1",
 		"prettier-plugin-jsdoc": "^0.3.24",
