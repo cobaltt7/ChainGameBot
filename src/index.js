@@ -245,7 +245,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 					return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
 				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD"))
 					return await interaction.reply({
-						content: "Lacking permissions, sorry!",
+						content: "Lacking Manage Server permission, sorry!",
 						ephemeral: true,
 					});
 				const game = interaction.options.getString("game");
@@ -274,7 +274,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 					return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
 				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD"))
 					return await interaction.reply({
-						content: "Lacking permissions, sorry!",
+						content: "Lacking Manage Server permission, sorry!",
 						ephemeral: true,
 					});
 				const game = interaction.options.getString("game");
