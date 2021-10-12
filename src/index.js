@@ -31,7 +31,7 @@ const guildSchema = {
 		unique: true,
 		required: true,
 	},
-	logs: {type:String}
+	logs: { type: String },
 };
 games.forEach((game) => {
 	databases[`${game.name}`] = mongoose.model(
@@ -96,7 +96,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		const game = games.find((game) => guildInfo[game.name] === msg.channelId);
 		if (!game) return;
 		const logChannelId = guildInfo["logs_" + game.name] || guildInfo.logs;
-			if (!logChannelId) return;
+		if (!logChannelId) return;
 		/** @type {TextChannel | undefined} */
 		// @ts-expect-error -- It's impossible for this to be set as a non-text channel.
 		const ruleChannel = await Discord.channels.fetch(logChannelId);
