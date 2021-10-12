@@ -31,6 +31,7 @@ const guildSchema = {
 		unique: true,
 		required: true,
 	},
+	logs: {type:String}
 };
 games.forEach((game) => {
 	databases[`${game.name}`] = mongoose.model(
@@ -62,6 +63,9 @@ games.forEach((game) => {
 	guildSchema[`${game.name}`] = {
 		type: String,
 	};
+	guildSchema[`logs_${game.name}`] = {
+		type: String,
+	};
 });
 databases.Guilds = mongoose.model("Guild", new mongoose.Schema(guildSchema));
 
@@ -90,8 +94,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		const guildInfo = await databases.Guilds.findOne({ id: msg.guild?.id || "" }).exec();
 		if (!guildInfo) return;
 		const game = games.find((game) => guildInfo[game.name] === msg.channelId);
-		const logChannelId = guildInfo["logs_" + game?.name] || guildInfo.logs;
-		if (!game || !logChannelId) return;
+		if (!game) return;
+		const logChannelId = guildInfo["logs_" + game.name] || guildInfo.logs;
+			if (!logChannelId) return;
 		/** @type {TextChannel | undefined} */
 		// @ts-expect-error -- It's impossible for this to be set as a non-text channel.
 		const ruleChannel = await Discord.channels.fetch(logChannelId);
@@ -99,8 +104,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		try {
 			const word = msg.content.toLowerCase().trim().replaceAll("`", "'");
 
+			// don't allow whitespace
 			if (!game.whitespace && /\s/.test(word)) {
-				// don't allow whitespace
 				msg.delete();
 
 				const embed = new MessageEmbed()
@@ -115,8 +120,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				return;
 			}
 
+			// use Wiktionary's API to determine if it is a word
 			if (game.validWordsOnly) {
-				// use Wiktionary's API to determine if it is a word
 				/** @type {any} */
 				const response = await fetch({
 					headers: {
