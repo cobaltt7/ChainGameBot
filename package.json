@@ -26,8 +26,11 @@
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {
+		"@discordjs/builders": "^0.6.0",
+		"@discordjs/rest": "^0.1.0-canary.0",
 		"@onedotprojects/eslint-plugin": "^2.2.1",
-		"@types/node": "16.4.14",
+		"@types/node": "^16.10.3",
+		"discord-api-types": "^0.23.1",
 		"eslint": "^7.32.0",
 		"eslint-config-hardcore": "20.3.0",
 		"eslint-plugin-compat": "^3.12.0",
