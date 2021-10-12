@@ -4,7 +4,7 @@ export default {
 	name: "Word Chain",
 	whitespace: false,
 	validWordsOnly: true,
-	twiceInRow: true,
+	twiceInRow: true, // todo
 	duplicates: false,
 	manualCheck(word, lastWord) {
 		// determine if it starts with the last letter of the previous word
