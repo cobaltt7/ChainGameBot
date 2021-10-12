@@ -240,30 +240,41 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 					ephemeral: true,
 				});
 			}
+
+			const serverInfo = await databases.Guilds.findOne({id: interaction.guild.id});
+
 			if (interaction.commandName === "set-game") {
 				if (!interaction.guild)
-					return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
-				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD"))
+					return await interaction.reply({content: "No DMs, sorry!", ephemeral: true});
+
+				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD")){
 					return await interaction.reply({
 						content: "Lacking Manage Server permission, sorry!",
 						ephemeral: true,
 					});
+				}
+
 				const game = interaction.options.getString("game");
 				if (!game)
 					return interaction.reply({
 						content: "Please specify a game!",
 						ephemeral: true,
 					});
-				if (await databases.Guilds.findOne({ id: interaction.guild.id }))
+				if (serverInfo) {
+					if(Object.values({...serverInfo,id:undefined}).includes(interaction.channel?.id)){
+						return interaction.reply({
+							content: "This channel is already in use!",
+							ephemeral: true,
+						});}
 					await databases.Guilds.updateOne(
 						{ id: interaction.guild.id },
 						{ [game]: interaction.channel?.id },
-					);
-				else
+					);}
+				else{
 					await new databases.Guilds({
 						id: interaction.guild.id,
 						[game]: interaction.channel?.id,
-					}).save();
+					}).save();}
 				await interaction.reply({
 					content: "This channel has been initialized for a game of " + game + "!",
 				});
@@ -279,21 +290,26 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 					});
 				const game = interaction.options.getString("game");
 				if (game) {
-					if (await databases.Guilds.findOne({ id: interaction.guild.id }))
+					if (serverInfo){
+						if(Object.entries({...serverInfo,id:undefined}).find(item=>!item[0].startsWith("logs_"&&item[1]===interaction.channel?.id)){
+							return interaction.reply({
+								content: "This channel is already in use!",
+								ephemeral: true,
+							});}
 						await databases.Guilds.updateOne(
 							{ id: interaction.guild.id },
 							{ ["logs_" + game]: interaction.channel?.id },
-						);
+						);}
 					else
 						await new databases.Guilds({
 							id: interaction.guild.id,
-							[game]: interaction.channel?.id,
+							["logs_" + game]: interaction.channel?.id,
 						}).save();
 					await interaction.reply({
 						content: "Logs for " + game + " will be posted here!",
 					});
 				} else {
-					if (await databases.Guilds.findOne({ id: interaction.guild.id }))
+					if (serverInfo)
 						await databases.Guilds.updateOne(
 							{ id: interaction.guild.id },
 							{ logs: interaction.channel?.id },
