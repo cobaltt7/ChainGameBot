@@ -12,7 +12,7 @@ export default {
 		if (shouldStartWith && shouldStartWith !== word[0]) {
 			return new MessageEmbed()
 				.setTitle("Doesn't start with correct character!")
-				.setDescription(`\`${word}\` does not start with ${shouldStartWith}!`);
+				.setDescription(`\`${word}\` does not start with `${shouldStartWith}`!`);
 		}
 		return true;
 	},
