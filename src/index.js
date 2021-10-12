@@ -223,7 +223,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 			await msg.react("👍");
 			return;
 		} catch (error) {
-			handleError(error, (data)=>ruleChannel.send(data), ruleChannel);
+			handleError(error, (data) => ruleChannel.send(data), ruleChannel);
 		}
 	})
 	.on("interactionCreate", async (interaction) => {
@@ -310,7 +310,11 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				// purge channel option
 			}
 		} catch (error) {
-			await handleError(error, (data)=>interaction.reply(data) || (() => {}), interaction.channel);
+			await handleError(
+				error,
+				(data) => interaction.reply(data) || (() => {}),
+				interaction.channel,
+			);
 		}
 	});
 
