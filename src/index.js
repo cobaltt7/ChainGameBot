@@ -151,7 +151,10 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				}
 			}
 
-			const lastWord = await databases[game.name].findOne({guild:msg.guildId}).sort({ index: -1 }).exec();
+			const lastWord = await databases[game.name]
+				.findOne({ guild: msg.guildId })
+				.sort({ index: -1 })
+				.exec();
 
 			if (game.manualCheck) {
 				const manualCheckResult = game.manualCheck(word, lastWord);
@@ -187,7 +190,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 
 			if (!game.duplicates) {
 				// determine if it has been used before
-				const used = await databases[game.name].findOne({ word ,guild:msg.guildId}).exec();
+				const used = await databases[game.name]
+					.findOne({ word, guild: msg.guildId })
+					.exec();
 				if (used) {
 					msg.delete();
 					const usedMsg = await msg.channel.messages.fetch(used.id);
@@ -213,7 +218,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				author: msg.author.id,
 				id: msg.id,
 				index: (lastWord?.index ?? -1) + 1,
-				guild:msg.guildId,
+				guild: msg.guildId,
 			}).save();
 
 			await msg.react("👍");
