@@ -270,10 +270,10 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 					});
 				}
 
-				const last = interaction.options.getString("last");
+				const last = interaction.options.getString("message");
 				if (!last) {
 					return interaction.reply({
-						content: "Please specify what to set the last message to!",
+						content: "Please specify what to post!",
 						ephemeral: true,
 					});
 				}

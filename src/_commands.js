@@ -31,7 +31,7 @@ const commands = [
 		.addStringOption((option) => {
 			return option
 				.setName("message")
-				.setDescription("The game you want to post")
+				.setDescription("The message you want to post")
 				.setRequired(true);
 		}),
 	new SlashCommandBuilder()
