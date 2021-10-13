@@ -4,7 +4,7 @@ export default {
 	name: "Counting",
 	match: /^\d+$/,
 	validWordsOnly: false,
-	twiceInRow: true,process.env.NODE_ENV !== "production",
+	twiceInRow: true,//process.env.NODE_ENV !== "production",
 	duplicates: false,
 	manualCheck(number, lastNumber) {
 		if (number === lastNumber + 1) {
