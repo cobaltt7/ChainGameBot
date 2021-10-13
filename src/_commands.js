@@ -26,6 +26,15 @@ const commands = [
 			}, option.setName("game").setDescription("The game you want to initialize").setRequired(true));
 		}),
 	new SlashCommandBuilder()
+		.setName("set-last")
+		.setDescription("Force post a message")
+		.addStringOption((option) => {
+			return option
+				.setName("message")
+				.setDescription("The game you want to post")
+				.setRequired(true);
+		}),
+	new SlashCommandBuilder()
 		.setName("set-logs")
 		.setDescription("Set up logs in this channel")
 		.addStringOption((option) => {

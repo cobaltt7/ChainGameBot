@@ -92,14 +92,15 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 		await msg.channel.send({ content: "No DMs, sorry!" });
 	})
 	.on("messageCreate", async (msg) => {
+		// todo also post channel it was from
 		if (!msg.guild) {
 			await msg.reply({ content: "No DMs, sorry!" });
 			return;
 		}
 		if (msg.author.id === Discord.user?.id) return;
-		const guildInfo = await databases.Guilds.findOne({ id: msg.guild?.id || "" }).exec();
+		const guildInfo = await databases.Guilds.findOne({ id: msg.guild.id || "" }).exec();
 		if (!guildInfo) return;
-		const game = games.find((game) => guildInfo[game.name] === msg.channelId);
+		const game = games.find((game) => guildInfo[game.name] === msg.channel.id);
 		if (!game) return;
 		const logChannelId = guildInfo["logs_" + game.name] || guildInfo.logs;
 		if (!logChannelId) return;
@@ -153,8 +154,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				}
 			}
 
-			const lastWord = await databases[game.name]
-				.findOne({ guild: msg.guildId })
+			const gameDatabase = databases[game.name];
+			const lastWord = await gameDatabase
+				.findOne({ guild: msg.guild.id })
 				.sort({ index: -1 })
 				.exec();
 
@@ -175,7 +177,11 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				}
 			}
 
-			if (!game.twiceInRow && lastWord?.author === msg.author.id) {
+			if (
+				msg.guild.id !== "823941138653773868" &&
+				!game.twiceInRow &&
+				lastWord?.author === msg.author.id
+			) {
 				msg.delete();
 
 				const embed = new MessageEmbed()
@@ -190,11 +196,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				return;
 			}
 
-			if (msg.guildId !== "823941138653773868" && !game.duplicates) {
+			if (!game.duplicates) {
 				// determine if it has been used before
-				const used = await databases[game.name]
-					.findOne({ word, guild: msg.guildId })
-					.exec();
+				const used = await gameDatabase.findOne({ word, guild: msg.guild.id }).exec();
 				if (used) {
 					const usedMsg = await msg.channel.messages.fetch(used.id).catch(() => {});
 					if (usedMsg) {
@@ -203,7 +207,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 							.setTitle("Duplicate word!")
 							.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
 							.setDescription(
-								`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guildId}/${usedMsg.channelId}/${used.id}) by <@${used.author}>!`,
+								`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guild.id}/${usedMsg.channel.id}/${used.id}) by <@${used.author}>!`,
 							)
 							.setThumbnail(
 								(await Discord.users.fetch(used.author)).displayAvatarURL(),
@@ -214,17 +218,17 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 							embeds: [embed],
 						});
 						return;
-					} else databases[game.name].deleteOne({ _id: used._id });
+					} else gameDatabase.deleteOne({ _id: used._id });
 				}
 			}
 
 			// all checks out, add to db
-			await new databases[game.name]({
+			await new gameDatabase({
 				word,
 				author: msg.author.id,
 				id: msg.id,
 				index: (lastWord?.index ?? -1) + 1,
-				guild: msg.guildId,
+				guild: msg.guild.id,
 			}).save();
 
 			await msg.react("👍");
@@ -250,7 +254,53 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				});
 			}
 
-			const serverInfo = await databases.Guilds.findOne({ id: interaction.guild.id });
+			const guildInfo = await databases.Guilds.findOne({ id: interaction.guild.id });
+			if (!guildInfo) return;
+
+			if (interaction.commandName === "set-last") {
+				if (
+					!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_MESSAGES")
+				) {
+					return await interaction.reply({
+						content: "Lacking Manage Messages permission, sorry!",
+						ephemeral: true,
+					});
+				}
+
+				const last = interaction.options.getString("last");
+				if (!last) {
+					return interaction.reply({
+						content: "Please specify what to set the last message to!",
+						ephemeral: true,
+					});
+				}
+				const game = games.find((game) => guildInfo[game.name] === interaction.channel?.id);
+				if (!game) return;
+
+				const gameDatabase = databases[game.name];
+
+				const msg = await interaction.reply({
+					content: last.replace(/([*_~|<`])/g, "\\$1"),
+					fetchReply: true,
+				});
+				await Promise.all([
+					new gameDatabase({
+						word: last,
+						author: Discord.user?.id,
+						id: msg.id,
+						index:
+							((
+								await gameDatabase
+									.findOne({ guild: interaction.guild.id })
+									.sort({ index: -1 })
+									.exec()
+							)?.index ?? -1) + 1,
+						guild: interaction.guild.id,
+					}).save(),
+					msg?.react?.("👍"),
+				]);
+				return;
+			}
 
 			if (interaction.commandName === "set-game") {
 				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD")) {
@@ -266,9 +316,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 						content: "Please specify a game!",
 						ephemeral: true,
 					});
-				if (serverInfo) {
+				if (guildInfo) {
 					if (
-						Object.values({ ...serverInfo, id: undefined }).includes(
+						Object.values({ ...guildInfo, id: undefined }).includes(
 							interaction.channel?.id,
 						)
 					) {
@@ -300,9 +350,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 					});
 				const game = interaction.options.getString("game");
 				if (game) {
-					if (serverInfo) {
+					if (guildInfo) {
 						if (
-							Object.entries({ ...serverInfo, id: undefined }).find(
+							Object.entries({ ...guildInfo, id: undefined }).find(
 								(item) =>
 									!item[0].startsWith("logs_") &&
 									item[1] === interaction.channel?.id,
@@ -326,7 +376,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 						content: "Logs for " + game + " will be posted here!",
 					});
 				} else {
-					if (serverInfo)
+					if (guildInfo)
 						await databases.Guilds.updateOne(
 							{ id: interaction.guild.id },
 							{ logs: interaction.channel?.id },
