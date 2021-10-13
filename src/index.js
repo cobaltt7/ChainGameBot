@@ -7,7 +7,6 @@ import { Client, Intents as intents, MessageEmbed, TextChannel } from "discord.j
 // set up process.env
 dotenv.config();
 
-const CHANNELS = { rules: "823941821695918121" };
 const ME_ID = "771422735486156811";
 
 //set up db stuffs
@@ -81,7 +80,7 @@ const Discord = new Client({
 		intents.FLAGS.DIRECT_MESSAGE_TYPING,
 	],
 });
-Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.application?.id))
+Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.application?.id))
 	.on("disconnect", () => console.warn("Disconnected from Discord"))
 	.on("debug", console.debug)
 	.on("warn", console.warn)
@@ -94,6 +93,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 			await msg.reply({ content: "No DMs, sorry!" });
 			return;
 		}
+		if (msg.author.id === Discord.user?.id) return;
 		const guildInfo = await databases.Guilds.findOne({ id: msg.guild?.id || "" }).exec();
 		if (!guildInfo) return;
 		const game = games.find((game) => guildInfo[game.name] === msg.channelId);
@@ -123,6 +123,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 			}
 
 			// use Wiktionary's API to determine if it is a word
+			// todo better
 			if (game.validWordsOnly) {
 				/** @type {any} */
 				const response = await fetch({
@@ -186,27 +187,29 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				return;
 			}
 
-			if (!game.duplicates) {
+			if ((msg.guildId!=="823941138653773868")&&(!game.duplicates)) {
 				// determine if it has been used before
 				const used = await databases[game.name]
 					.findOne({ word, guild: msg.guildId })
 					.exec();
 				if (used) {
-					msg.delete();
-					const usedMsg = await msg.channel.messages.fetch(used.id);
-					const embed = new MessageEmbed()
+					const usedMsg = await msg.channel.messages.fetch(used.id).catch(() => { });
+					if (usedMsg) {
+						msg.delete();
+						const embed = new MessageEmbed()
 						.setTitle("Duplicate word!")
 						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
 						.setDescription(
 							`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guildId}/${usedMsg.channelId}/${used.id}) by <@${used.author}>!`,
-						)
-						.setThumbnail((await Discord.users.fetch(used.author)).displayAvatarURL());
+							)
+							.setThumbnail((await Discord.users.fetch(used.author)).displayAvatarURL());
 
-					ruleChannel.send({
-						content: msg.author.toString(),
-						embeds: [embed],
-					});
-					return;
+							ruleChannel.send({
+								content: msg.author.toString(),
+								embeds: [embed],
+							});
+							return;
+						}else 					databases[game.name].deleteOne({_id: used._id});
 				}
 			}
 
