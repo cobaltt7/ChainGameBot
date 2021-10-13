@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 
 export default {
 	name: "Word Chain",
-	whitespace: false,
+	match: /^[a-zA-Z]+$/,
 	validWordsOnly: true,
 	twiceInRow: process.env.NODE_ENV !== "production",
 	duplicates: false,

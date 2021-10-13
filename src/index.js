@@ -107,14 +107,13 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		try {
 			const word = msg.content.toLowerCase().trim().replaceAll("`", "'");
 
-			// don't allow whitespace
-			if (!game.whitespace && /\s/.test(word)) {
+			if (game.match?.test(word)) {
 				msg.delete();
 
 				const embed = new MessageEmbed()
-					.setTitle("Multiple words sent!")
+					.setTitle("Invalid character sent!")
 					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`\`${word}\` is more than one word!`);
+					.setDescription(`\`${word}\` contains invalid characters!`);
 
 				ruleChannel.send({
 					content: msg.author.toString(),
@@ -230,13 +229,16 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		try {
 			if (!interaction.isCommand()) return;
 
+			if (!interaction.guild)
+				return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
+
 			if (interaction.commandName === "ping") {
 				return await interaction.reply({ content: "Pong!", ephemeral: true });
 			}
 			if (interaction.commandName === "invite") {
 				return await interaction.reply({
 					content:
-						"https://discord.com/api/oauth2/authorize?client_id=823932474118635540&permissions=2147838016&scope=bot%20applications.commands",
+						`https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=2147838016&scope=bot%20applications.commands`,
 					ephemeral: true,
 				});
 			}
@@ -244,9 +246,6 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 			const serverInfo = await databases.Guilds.findOne({ id: interaction.guild.id });
 
 			if (interaction.commandName === "set-game") {
-				if (!interaction.guild)
-					return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
-
 				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD")) {
 					return await interaction.reply({
 						content: "Lacking Manage Server permission, sorry!",
@@ -287,8 +286,6 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 				// purge channel option
 			}
 			if (interaction.commandName === "set-logs") {
-				if (!interaction.guild)
-					return await interaction.reply({ content: "No DMs, sorry!", ephemeral: true });
 				if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD"))
 					return await interaction.reply({
 						content: "Lacking Manage Server permission, sorry!",
