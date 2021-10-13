@@ -57,7 +57,7 @@
 		"game"
 	],
 	"engines": {
-		"node": ">=14.15.4"
+		"node": ">=16.6.0"
 	},
 	"prettier": {
 		"iniSpaceAroundEquals": true,

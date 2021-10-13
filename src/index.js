@@ -4,6 +4,9 @@ import fileSystem from "fs";
 import mongoose from "mongoose";
 import { Client, Intents as intents, MessageEmbed, TextChannel } from "discord.js";
 
+process.on("unhandledException", console.error);
+process.on("unhandledRejection", console.error);
+
 // set up process.env
 dotenv.config();
 
