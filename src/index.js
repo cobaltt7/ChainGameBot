@@ -341,7 +341,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		} catch (error) {
 			await handleError(
 				error,
-				async (data) => await interaction?.reply?.(data) || (() => {}),
+				async (data) => (await interaction?.reply?.(data)) || (() => {}),
 				interaction.channel,
 			);
 		}
