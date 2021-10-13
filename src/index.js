@@ -60,7 +60,7 @@ games.forEach((game) => {
 				unique: true,
 			},
 			guild: {
-				type: Number,
+				type: String,
 				required: true,
 			},
 		}),
