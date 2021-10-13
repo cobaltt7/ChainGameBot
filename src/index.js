@@ -3,6 +3,7 @@ import fetch from "axios";
 import fileSystem from "fs";
 import mongoose from "mongoose";
 import { Client, Intents as intents, MessageEmbed, TextChannel } from "discord.js";
+import commands from "./_commands.js"
 
 process.on("unhandledException", console.error);
 process.on("unhandledRejection", console.error);
@@ -73,6 +74,8 @@ games.forEach((game) => {
 	};
 });
 databases.Guilds = mongoose.model("Guild", new mongoose.Schema(guildSchema));
+
+await commands;
 
 const Discord = new Client({
 	intents: [
