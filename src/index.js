@@ -107,7 +107,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 		try {
 			const word = msg.content.toLowerCase().trim().replaceAll("`", "'");
 
-			if (game.match&&!game.match.test(word)) {
+			if (game.match && !game.match.test(word)) {
 				msg.delete();
 
 				const embed = new MessageEmbed()
