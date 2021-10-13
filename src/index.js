@@ -187,29 +187,31 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				return;
 			}
 
-			if ((msg.guildId!=="823941138653773868")&&(!game.duplicates)) {
+			if (msg.guildId !== "823941138653773868" && !game.duplicates) {
 				// determine if it has been used before
 				const used = await databases[game.name]
 					.findOne({ word, guild: msg.guildId })
 					.exec();
 				if (used) {
-					const usedMsg = await msg.channel.messages.fetch(used.id).catch(() => { });
+					const usedMsg = await msg.channel.messages.fetch(used.id).catch(() => {});
 					if (usedMsg) {
 						msg.delete();
 						const embed = new MessageEmbed()
-						.setTitle("Duplicate word!")
-						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-						.setDescription(
-							`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guildId}/${usedMsg.channelId}/${used.id}) by <@${used.author}>!`,
+							.setTitle("Duplicate word!")
+							.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
+							.setDescription(
+								`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guildId}/${usedMsg.channelId}/${used.id}) by <@${used.author}>!`,
 							)
-							.setThumbnail((await Discord.users.fetch(used.author)).displayAvatarURL());
+							.setThumbnail(
+								(await Discord.users.fetch(used.author)).displayAvatarURL(),
+							);
 
-							ruleChannel.send({
-								content: msg.author.toString(),
-								embeds: [embed],
-							});
-							return;
-						}else 					databases[game.name].deleteOne({_id: used._id});
+						ruleChannel.send({
+							content: msg.author.toString(),
+							embeds: [embed],
+						});
+						return;
+					} else databases[game.name].deleteOne({ _id: used._id });
 				}
 			}
 
