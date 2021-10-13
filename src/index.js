@@ -237,8 +237,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with id`, Discord.
 			}
 			if (interaction.commandName === "invite") {
 				return await interaction.reply({
-					content:
-						`https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=2147838016&scope=bot%20applications.commands`,
+					content: `https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=2147838016&scope=bot%20applications.commands`,
 					ephemeral: true,
 				});
 			}
