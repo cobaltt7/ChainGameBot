@@ -252,15 +252,15 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 			}
 			if (interaction.commandName === "invite") {
 				return await interaction.reply({
-					content: `https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=2147838016&scope=bot%20applications.commands`,
+					content: `https://discord.com/api/oauth2/authorize?client_id=${Discord.user?.id}&permissions=2147838016&scope=bot%20applications.commands`,
 					ephemeral: true,
 				});
 			}
 
 			const guildInfo = await databases.Guilds.findOne({ id: interaction.guild.id });
-			if (!guildInfo) return;
 
 			if (interaction.commandName === "set-last") {
+				if (!guildInfo) return;
 				if (
 					!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_MESSAGES")
 				) {
@@ -273,7 +273,7 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				const last = interaction.options.getString("message");
 				if (!last) {
 					return interaction.reply({
-						content: "Please specify what to post!",
+						content: "Please specify what to force-post!",
 						ephemeral: true,
 					});
 				}
