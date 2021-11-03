@@ -8,7 +8,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2.3.5
+              uses: actions/checkout@v2.4.0
               with:
                   ref: ${{ github.head_ref }}
                   # token: ${{ secrets.TOKEN || github.token }}
