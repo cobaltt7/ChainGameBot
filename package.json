@@ -19,18 +19,18 @@
 		"start": "node --trace-warnings --harmony ."
 	},
 	"dependencies": {
-		"@discordjs/builders": "^0.7.0",
+		"@discordjs/builders": "^0.8.2",
 		"@discordjs/rest": "^0.1.0-canary.0",
 		"@types/axios": "^0.14.0",
 		"axios": "^0.23.0",
 		"discord-api-types": "^0.24.0",
 		"discord.js": "^13.2.0",
 		"dotenv": "^10.0.0",
-		"mongoose": "^6.0.11",
+		"mongoose": "^6.0.14",
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {
-		"@types/node": "^16.11.1",
+		"@types/node": "^16.11.11",
 		"eslint": "^7.32.0",
 		"eslint-config-hardcore": "20.3.0",
 		"eslint-plugin-compat": "^3.12.0",
@@ -39,7 +39,7 @@
 		"eslint-plugin-import": "^2.24.0",
 		"eslint-plugin-jsdoc": "^36.0.8",
 		"eslint-plugin-markdown": "^2.2.0",
-		"eslint-plugin-promise": "^5.1.0",
+		"eslint-plugin-promise": "^5.2.0",
 		"eslint-plugin-regexp": "^1.0.0",
 		"eslint-plugin-switch-case": "^1.1.2",
 		"eslint-plugin-unicorn": "^35.0.0",
