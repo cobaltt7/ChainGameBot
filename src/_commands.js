@@ -46,8 +46,9 @@ const commands = [
 
 const rest = new REST({ version: "9" }).setToken(`${process.env.BOT_TOKEN}`);
 
-export default Promise.all([rest
-	.put(Routes.applicationCommands("823932474118635540"), { body: commands }),rest
-	.put(Routes.applicationCommands("897668755604250654"), { body: commands })])
+export default Promise.all([
+	rest.put(Routes.applicationCommands("823932474118635540"), { body: commands }),
+	rest.put(Routes.applicationCommands("897668755604250654"), { body: commands }),
+])
 	.then(() => console.log("Successfully registered application commands."))
 	.catch(console.error);
