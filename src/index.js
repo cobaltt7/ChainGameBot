@@ -58,7 +58,7 @@ games.forEach((game) => {
 			index: {
 				type: Number,
 				required: true,
-				unique: true,
+				unique: false,
 			},
 			guild: {
 				type: String,
