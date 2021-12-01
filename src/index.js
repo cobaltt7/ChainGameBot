@@ -75,8 +75,6 @@ games.forEach((game) => {
 });
 databases.Guilds = mongoose.model("Guild", new mongoose.Schema(guildSchema));
 
-await commands;
-
 const Discord = new Client({
 	intents: [
 		intents.FLAGS.GUILDS,
@@ -138,9 +136,9 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 							"Word Chain Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Word Chain game // https://github.com/RedGuy12/ShitoriBot",
 					},
 					method: "GET",
-					url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`, // todo not wikitionary
+					url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`,
 				});
-				if (response.data.error) {
+				if (response.data.error|| !response.data.parse.sections.find((section) => section.line==="English")) {
 					msg.delete();
 
 					const embed = new MessageEmbed()
