@@ -29,7 +29,6 @@
 		"sqlstring": "^2.3.2"
 	},
 	"devDependencies": {
-		"@onedotprojects/eslint-plugin": "^2.2.1",
 		"@types/node": "^16.11.1",
 		"eslint": "^7.32.0",
 		"eslint-config-hardcore": "20.3.0",

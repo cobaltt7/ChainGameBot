@@ -130,7 +130,6 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 			}
 
 			// use Wiktionary's API to determine if it is a word
-			// todo better
 			if (game.validWordsOnly) {
 				/** @type {any} */
 				const response = await fetch({
