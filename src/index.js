@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
-import fetch from "axios";
 import fileSystem from "fs";
 import mongoose from "mongoose";
 import {Client, Intents as intents, MessageEmbed, TextChannel} from "discord.js";
+import isWord from "./isWord";
 
 process.on("unhandledException", console.error);
 process.on("unhandledRejection", console.error);
@@ -128,30 +128,18 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 
 			// use Wiktionary's API to determine if it is a word
 			if (game.validWordsOnly) {
-				/** @type {any} */
-				const response = await fetch({
-					headers: {
-						"User-Agent":
-							"Word Chain Discord Bot by Paul Reid // A Discord bot to enforce the rules of the Word Chain game // https://github.com/RedGuy12/ShitoriBot",
-					},
-					method: "GET",
-					url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`,
-				});
-				if (response.data.error|| !response.data.parse.sections.find((section) => section.line==="English")) {
-					msg.delete();
+				if(!(await isWord(word) || await isWord(msg.content))) {
+				msg.delete();
 
-					const embed = new MessageEmbed()
-						.setTitle("Not a word!")
-						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-						.setDescription(`\`${word}\` is not a word!`);
+				const embed = new MessageEmbed()
+					.setTitle("Not a word!")
+					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
+					.setDescription(`\`${word}\` is not a word!`);
 
-					ruleChannel.send({
-						content: msg.author.toString(),
-						embeds: [embed],
-					});
-					return;
-				}
-			}
+				ruleChannel.send({
+					content: msg.author.toString(),
+					embeds: [embed],
+				});}
 
 			const gameDatabase = databases[game.name];
 			const lastWord = await gameDatabase
