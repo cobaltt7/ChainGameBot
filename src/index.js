@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import fileSystem from "fs";
 import mongoose from "mongoose";
 import {Client, Intents as intents, MessageEmbed, TextChannel} from "discord.js";
-import isWord from "./isWord";
+import isWord from "./isWord.js";
 
 process.on("unhandledException", console.error);
 process.on("unhandledRejection", console.error);
