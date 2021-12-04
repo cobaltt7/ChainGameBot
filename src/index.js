@@ -128,23 +128,26 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 
 			// use Wiktionary's API to determine if it is a word
 			if (game.validWordsOnly) {
-				if(!(await isWord(word) || await isWord(msg.content))) {
-				msg.delete();
+				if (!(await isWord(word) || await isWord(msg.content))) {
+					msg.delete();
 
-				const embed = new MessageEmbed()
-					.setTitle("Not a word!")
-					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`\`${word}\` is not a word!`);
+					const embed = new MessageEmbed()
+						.setTitle("Not a word!")
+						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
+						.setDescription(`\`${word}\` is not a word!`);
 
-				ruleChannel.send({
-					content: msg.author.toString(),
-					embeds: [embed],
-				});}
+					ruleChannel.send({
+						content: msg.author.toString(),
+						embeds: [embed],
+					});
+					return;
+				}
+			}
 
 			const gameDatabase = databases[game.name];
 			const lastWord = await gameDatabase
-				.findOne({ guild: msg.guild.id })
-				.sort({ index: -1 })
+				.findOne({guild: msg.guild.id})
+				.sort({index: -1})
 				.exec();
 
 			if (game.manualCheck) {
