@@ -16,4 +16,3 @@ export default async function isWord(word) {
 	}
 	return true;
 }
-}
