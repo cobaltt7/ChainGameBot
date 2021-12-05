@@ -6,7 +6,8 @@ export default {
 	validWordsOnly: false,
 	twiceInRow: true, //process.env.NODE_ENV !== "production",
 	duplicates: false,
-	manualCheck(number, {word: lastNumber = 0}={}) {
+	manualCheck(number, last) {
+const lastNumber=last?.word || 0;
 		if (+number !== (+lastNumber + 1)) {
 			return new MessageEmbed()
 				.setTitle("Incorrect number!")
