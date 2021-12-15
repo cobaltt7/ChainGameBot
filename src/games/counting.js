@@ -4,7 +4,7 @@ export default {
 	name: "Counting",
 	match: /^\d+$/,
 	validWordsOnly: false,
-	twiceInRow: false, //process.env.NODE_ENV !== "production",
+	twiceInRow: process.env.NODE_ENV !== "production",
 	duplicates: false,
 	manualCheck(number, last) {
 const lastNumber=last?.word || 0;
