@@ -1,6 +1,7 @@
 import { MessageEmbed } from "discord.js";
 
-export default {
+/** @type {import("../../types").Game} */
+const command= {
 	name: "Word Chain",
 	match: /^[a-zA-Z]+$/,
 	validWordsOnly: true,
@@ -17,3 +18,5 @@ export default {
 		return true;
 	},
 };
+
+export default command;

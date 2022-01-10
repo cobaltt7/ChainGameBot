@@ -6,7 +6,7 @@ import fileSystem from "fs";
 dotenv.config();
 
 const games = await Promise.all(
-	fileSystem.readdirSync(new URL("./games", import.meta.url)).map(async (file) => {
+	fileSystem.readdirSync(new URL("./games", import.meta.url).toString()).map(async (file) => {
 		return (await import("./games/" + file)).default;
 	}),
 );

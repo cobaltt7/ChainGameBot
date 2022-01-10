@@ -1,6 +1,11 @@
 
 import axios from "axios";
 
+/**
+ *
+ * @param {string} word
+ * @returns boolean
+ */
 export default async function isWord(word) {
 	/** @type {any} */
 	const response = await axios({
@@ -11,7 +16,7 @@ export default async function isWord(word) {
 		method: "GET",
 		url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`,
 	});
-	if (response.data.error|| !response.data.parse.sections.find((section) => section.line==="English")) {
+	if (response.data.error|| !response.data.parse.sections.find((/** @type {any}*/section) => section.line==="English")) {
 		return false;
 	}
 	return true;
