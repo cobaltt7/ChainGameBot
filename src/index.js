@@ -1,83 +1,96 @@
-import dotenv from "dotenv";
+/** @file Main Logic. */
 import fileSystem from "fs";
+import { fileUrlToPath } from "url";
+
+import { Client, Intents as intents, MessageEmbed } from "discord.js";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
-import {Client, Intents as intents, MessageEmbed, MessagePayload, TextChannel} from "discord.js";
+
 import isWord from "./isWord.js";
 
 process.on("unhandledException", console.error);
 process.on("unhandledRejection", console.error);
 
-// set up process.env
+// Set up process.env
 dotenv.config();
 
-const ME_ID = "771422735486156811";
+// Set up db stuffs
 
-//set up db stuffs
-
-await mongoose.connect(`${process.env.MONGO_URL}?retryWrites=true&w=majority`, {
+await mongoose.connect(`${process.env.MONGO_URL || ""}?retryWrites=true&w=majority`, {
 	appName: "bot",
 });
 mongoose.connection.on("error", console.error);
 
 /**
  * @type {{
- * [t: string]: mongoose.Model<import("../types").MessageDatabaseItem,{},{},{}>;
- * }} */
+ * 	[t: string]: mongoose.Model<import("../types").MessageDatabaseItem, {}, {}, {}>;
+ * }}
+ */
 const gameDatabases = {};
 
 const games = await Promise.all(
-	fileSystem.readdirSync(new URL("./games", import.meta.url).toString()).map(async (file) => {
-		return (await /** @type {Promise<{default: import("../types").Game}>} */(import("./games/" + file))).default;
-	}),
+	fileSystem
+		.readdirSync(fileUrlToPath(new URL("./games", import.meta.url).toString()))
+		.map(
+			async (file) =>
+				(
+					await /** @type {Promise<{ default: import("../types").Game }>} */ (
+						import(`./games/${file}`)
+					)
+				).default,
+		),
 );
 
-/** @type {mongoose.SchemaDefinitionProperty<undefined|any> } */
+/** @type {mongoose.SchemaDefinitionProperty<undefined | any>} */
 const guildSchema = {
 	id: {
+		required: true,
 		type: String,
 		unique: true,
-		required: true,
 	},
+
 	logs: { type: String },
 };
-games.forEach((game) => {
+
+for (const game of games) {
 	gameDatabases[`${game.name}`] = mongoose.model(
 		game.name,
 		new mongoose.Schema({
-			word: {
-				type: String,
-				required: true,
-				lowercase: true,
-				trim: true,
-			},
 			author: {
-				type: String,
 				required: true,
+				type: String,
 			},
+
+			guild: {
+				required: true,
+				type: String,
+			},
+
 			id: {
+				required: true,
 				type: String,
 				unique: true,
-				required: true,
 			},
+
 			index: {
-				type: Number,
 				required: true,
+				type: Number,
 				unique: false,
 			},
-			guild: {
-				type: String,
+
+			word: {
+				lowercase: true,
 				required: true,
+				trim: true,
+				type: String,
 			},
 		}),
 	);
-	guildSchema[`${game.name}`] = {
-		type: String,
-	};
-	guildSchema[`logs_${game.name}`] = {
-		type: String,
-	};
-});
-const guildDatabase = mongoose.model("Guild", new mongoose.Schema(guildSchema));
+	guildSchema[`${game.name}`] = { type: String };
+	guildSchema[`logs_${game.name}`] = { type: String };
+}
+
+const GuildDatabase = mongoose.model("Guild", new mongoose.Schema(guildSchema));
 
 const Discord = new Client({
 	intents: [
@@ -87,328 +100,18 @@ const Discord = new Client({
 		intents.FLAGS.DIRECT_MESSAGES,
 		intents.FLAGS.DIRECT_MESSAGE_TYPING,
 	],
+
+	partials: ["USER", "REACTION", "MESSAGE"],
 });
-Discord.once("ready", () => console.log(`Connected to Discord with ID`, Discord.application?.id))
-	.on("disconnect", () => console.warn("Disconnected from Discord"))
-	.on("debug", console.debug)
-	.on("warn", console.warn)
-	.on("error", console.error)
-	.on("typingStart", async (msg) => {
-		await msg.channel.send({ content: "No DMs, sorry!" });
-	})
-	.on("messageCreate", async (msg) => {
-		if (msg.mentions.users.has(msg.client.user?.id || "")) msg.react("👋");
-		if (!msg.guild) {
-			await msg.reply({ content: "No DMs, sorry!" });
-			return;
-		}
-		if (msg.author.id === Discord.user?.id) return;
-		const guildInfo = await guildDatabase?.findOne({ id: msg.guild?.id || "" }).exec();
-		if (!guildInfo) return;
-		const game = games.find((game) => guildInfo[game.name] === msg.channel.id);
-		if (!game) return;
-		const logChannelId = guildInfo["logs_" + game.name] || guildInfo.logs;
-		if (!logChannelId) return;
-		const ruleChannel = await Discord.channels.fetch(logChannelId);
-		if (!ruleChannel?.isText()) return
-		try {
-			const word = msg.cleanContent.toLowerCase().trim().replaceAll("`", "'");
-
-			if (game.match && !game.match.test(word)) {
-				msg.delete();
-
-				const embed = new MessageEmbed()
-					.setTitle("Invalid character sent!")
-					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`\`${word}\` contains invalid characters!`)
-					;
-
-				ruleChannel.send({
-					content: `${msg.author} | ${msg.channel}`,
-					embeds: [embed],
-				});
-				return;
-			}
-
-			// use Wiktionary's API to determine if it is a word
-			if (game.validWordsOnly) {
-				if (!(await isWord(word) || await isWord(msg.cleanContent)|| await isWord(msg.content))) {
-					msg.delete();
-
-					const embed = new MessageEmbed()
-						.setTitle("Not a word!")
-						.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-						.setDescription(`\`${word}\` is not a word!`)
-						;
-
-					ruleChannel.send({
-						content: `${msg.author} | ${msg.channel}`,
-						embeds: [embed],
-					});
-					return;
-				}
-			}
-
-			const gameDatabase = gameDatabases[game.name];
-			if(!gameDatabase) return
-			const lastWord = await gameDatabase
-				.findOne({guild: msg.guild.id})
-				.sort({index: -1})
-				.exec();
-
-			if (game.manualCheck) {
-				const manualCheckResult = game.manualCheck(word, lastWord??undefined);
-				if (manualCheckResult !== true) {
-					msg.delete();
-					ruleChannel.send({
-						content: `${msg.author} | ${msg.channel}`,
-						embeds: [
-							manualCheckResult.setAuthor(
-								msg.author.tag,
-								msg.author.displayAvatarURL(),
-							)
-							,
-						],
-					});
-					return;
-				}
-			}
-
-			if (
-				msg.guild.id !== "823941138653773868" &&
-				!game.twiceInRow &&
-				lastWord?.author === msg.author.id
-			) {
-				msg.delete();
-
-				const embed = new MessageEmbed()
-					.setTitle("Posting twice in a row!")
-					.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-					.setDescription(`No posting twice in a row allowed!`)
-					;
-
-				ruleChannel.send({
-					content: `${msg.author} | ${msg.channel}`,
-					embeds: [embed],
-				});
-				return;
-			}
-
-			if (!game.duplicates) {
-				// determine if it has been used before
-				const used = await gameDatabase.findOne({ word, guild: msg.guild.id }).exec();
-				if (used) {
-					const usedMsg = await msg.channel.messages.fetch(used.id).catch(() => {});
-					if (usedMsg) {
-						msg.delete();
-						const embed = new MessageEmbed()
-							.setTitle("Duplicate word!")
-							.setAuthor(msg.author.tag, msg.author.displayAvatarURL())
-							.setDescription(
-								`\`${word}\` has [been used before](https://discord.com/channels/${usedMsg.guild?.id}/${usedMsg.channel.id}/${used.id}) by <@${used.author}>!`,
-							)
-							.setThumbnail(
-								(await Discord.users.fetch(used.author)).displayAvatarURL(),
-							)
-							;
-
-						ruleChannel.send({
-							content: `${msg.author} | ${msg.channel}`,
-							embeds: [embed],
-						});
-						return;
-					} else gameDatabase.deleteOne({ _id: used._id });
-				}
-			}
-
-			// all checks out, add to db
-			await new gameDatabase({
-				word,
-				author: msg.author.id,
-				id: msg.id,
-				index: (lastWord?.index ?? -1) + 1,
-				guild: msg.guild.id,
-			}).save();
-
-			await msg.react("👍");
-			return;
-		} catch (error) {
-			handleError(error, (data) => ruleChannel.send(data));
-		}
-	})
-	.on("interactionCreate", async (interaction) => {
-		if (!interaction.isCommand()) return;
-		try {
-			switch (interaction.commandName) {
-				case "ping": {
-					return await interaction.reply({content: "Pong!", ephemeral: true});
-				}
-				case "invite": {
-					return await interaction.reply({
-						content: `https://discord.com/api/oauth2/authorize?client_id=${Discord.user?.id}&permissions=2147838016&scope=bot%20applications.commands`,
-						ephemeral: true,
-					});
-				}
-			}
-
-			if (!interaction.guild||!interaction.channel||!("guild" in interaction.channel))
-			return await interaction.reply({content: "This command is not supported in DMs, sorry!", ephemeral: true});
-
-			if (!interaction.member || !("permissionsIn" in interaction.member)) return;
-
-			const guildInfo = (await guildDatabase.findOne({ id: interaction.guild.id }))||{};
-
-			switch (interaction.commandName) {
-				case "set-last": {
-					if (!guildInfo) return;
-					if (
-						!interaction.member.permissionsIn(interaction.channel).has("MANAGE_MESSAGES")
-					) {
-						return await interaction.reply({
-							content: "Lacking Manage Messages permission, sorry!",
-							ephemeral: true,
-						});
-					}
-
-					const last = interaction.options.getString("message");
-					if (!last) {
-						return interaction.reply({
-							content: "Please specify what to force-post!",
-							ephemeral: true,
-						});
-					}
-					const game = games.find((game) => guildInfo[game.name] === interaction.channel?.id);
-					if (!game) return;
-
-					const gameDatabase = gameDatabases[game.name];
-					if(!gameDatabase) return;
-
-					const msg = await interaction.reply({
-						content: last.replace(/([*_~|<`])/g, "\\$1"),
-						fetchReply: true,
-					});
-					await Promise.all([
-						new gameDatabase({
-							word: last,
-							author: Discord.user?.id,
-							id: msg.id,
-							index:
-								((
-									await gameDatabase
-										.findOne({guild: interaction.guild.id})
-										.sort({index: -1})
-										.exec()
-								)?.index ?? -1) + 1,
-							guild: interaction.guild.id,
-						}).save(),
-						"react" in msg? msg.react("👍").then(()=>{}): Promise.resolve(),
-					]);
-					return;
-				}
-
-				case "set-game": {
-					if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD")) {
-						return await interaction.reply({
-							content: "Lacking Manage Server permission, sorry!",
-							ephemeral: true,
-						});
-					}
-
-					const game = interaction.options.getString("game");
-					if (!game)
-						return interaction.reply({
-							content: "Please specify a game!",
-							ephemeral: true,
-						});
-					if (guildInfo) {
-						if (
-							Object.values({...guildInfo, id: undefined}).includes(
-								interaction.channel?.id,
-							)
-						) {
-							return interaction.reply({
-								content: "This channel is already in use!",
-								ephemeral: true,
-							});
-						}
-						await guildDatabase.updateOne(
-							{id: interaction.guild.id},
-							{[game]: interaction.channel?.id},
-						);
-					} else {
-						await new guildDatabase({
-							id: interaction.guild.id,
-							[game]: interaction.channel?.id,
-						}).save();
-					}
-					await interaction.reply({
-						content: "This channel has been initialized for a game of " + game + "!",
-					});
-					// todo: purge channel option
-					return;
-				}
-				case "set-logs": {
-					if (!interaction.member?.permissionsIn?.(interaction.channel).has("MANAGE_GUILD"))
-						return await interaction.reply({
-							content: "Lacking Manage Server permission, sorry!",
-							ephemeral: true,
-						});
-					const game = interaction.options.getString("game");
-					if (game) {
-						if (guildInfo) {
-							if (
-								Object.entries({...guildInfo, id: undefined}).find(
-									(item) =>
-										!item[0].startsWith("logs_") &&
-										item[1] === interaction.channel?.id,
-								)
-							) {
-								return interaction.reply({
-									content: "This channel is already in use!",
-									ephemeral: true,
-								});
-							}
-							await guildDatabase.updateOne(
-								{id: interaction.guild.id},
-								{["logs_" + game]: interaction.channel?.id},
-							);
-						} else
-							await new guildDatabase({
-								id: interaction.guild.id,
-								["logs_" + game]: interaction.channel?.id,
-							}).save();
-						await interaction.reply({
-							content: "Logs for " + game + " will be posted here!",
-						});
-					} else {
-						if (guildInfo)
-							await guildDatabase.updateOne(
-								{id: interaction.guild.id},
-								{logs: interaction.channel?.id},
-							);
-						else
-							await new guildDatabase({
-								id: interaction.guild.id,
-								logs: interaction.channel?.id,
-							}).save();
-						await interaction.reply({
-							content: "Logs will be posted here if no game-specific channel is set!",
-						});
-					}
-					// todo: purge channel option
-				}
-			}
-		} catch (error) {
-			await handleError(
-				error,
-				(data) => interaction.reply({...data,ephemeral: true}),
-			);
-		}
-	}).login(process.env.BOT_TOKEN);
 
 /**
- * @param {unknown} error
- * @param {(options: import("discord.js").MessageOptions)=> Promise<any>} send
+ * Handle an error.
+ *
+ * @param {unknown} error - Error.
+ * @param {(options: import("discord.js").MessageOptions) => Promise<void>} send - Function that
+ *   posts the error.
+ *
+ * @returns {Promise<void[] | void>} - Nothing of value.
  */
 async function handleError(error, send) {
 	try {
@@ -422,10 +125,426 @@ async function handleError(error, send) {
 					"[3 backticks]",
 				)}\`\`\``,
 			);
-		return send({
-			embeds: [embed],
-			content: "Join the support server linked in my bio!", });
+
+		const promises = [
+			send({
+				content: "Join the support server linked in my bio!",
+				embeds: [embed],
+			}),
+		];
+
+		if (process.env.NODE_ENV === "production") {
+			promises.push(
+				(async () => {
+					const channel = await Discord.channels.fetch("897639265696112670");
+
+					if (channel?.isText()) await channel.send({ embeds: [embed] });
+				})(),
+			);
+		}
+
+		return await Promise.all(promises);
 	} catch (errorError) {
 		return console.error(errorError);
 	}
 }
+
+Discord.on("ready", async () => {
+	console.log("Connected to Discord with ID", Discord.application?.id);
+
+	if (process.env.NODE_ENV === "production") {
+		const channel = await Discord.channels.fetch("826457135415033867");
+
+		if (channel?.isText()) await channel.send("Bot online!");
+	}
+})
+	.on("disconnect", () => console.warn("Disconnected from Discord"))
+	.on("debug", console.debug)
+	.on("warn", console.warn)
+	.on("error", console.error)
+	.on("typingStart", async (message) => {
+		await message.channel.send({ content: "No DMs, sorry!" });
+	})
+	.on("messageCreate", async (rawMessage) => {
+		const message = rawMessage.partial ? await rawMessage.fetch() : rawMessage;
+		const author = message.author.partial ? await message.author.fetch() : message.author;
+
+		if (message.mentions.users.has(message.client.user?.id || "")) await message.react("👋");
+
+		if (!message.guild) {
+			await message.reply({ content: "No DMs, sorry!" });
+
+			return;
+		}
+
+		if (author.id === Discord.user?.id) return;
+
+		const guildInfo = await GuildDatabase?.findOne({ id: message.guild?.id || "" }).exec();
+
+		if (!guildInfo) return;
+
+		const thisGame = games.find((game) => guildInfo[game.name] === message.channel.id);
+
+		if (!thisGame) return;
+
+		const logChannelId = guildInfo[`logs_${thisGame.name}`] || guildInfo.logs;
+
+		if (!logChannelId) return;
+
+		const ruleChannel = await Discord.channels.fetch(logChannelId);
+
+		if (!ruleChannel?.isText()) return;
+
+		/**
+		 * Reject a message posted as invalid.
+		 *
+		 * @param {MessageEmbed} embed - Embed describing why it is invalid. Note that any `author`
+		 *   set on this message will be overwritten.
+		 */
+		async function reject(embed) {
+			embed.setAuthor(author.tag, author.displayAvatarURL());
+
+			if (!ruleChannel?.isText()) return;
+
+			await Promise.all([
+				message.delete(),
+				ruleChannel.send({
+					content: `${author.toString()} | <#${message.channel.id}>`,
+					embeds: [embed],
+				}),
+			]);
+		}
+
+		try {
+			const word = message.cleanContent.toLowerCase().trim().replaceAll("`", "'");
+
+			if (thisGame.match && !thisGame.match.test(word)) {
+				const embed = new MessageEmbed()
+					.setTitle("Invalid character sent!")
+					.setDescription(`\`${word}\` contains invalid characters!`);
+
+				return await reject(embed);
+			}
+
+			// Use Wiktionary's API to determine if it is a word
+			if (
+				thisGame.validWordsOnly &&
+				!(
+					(await isWord(word)) ||
+					(await isWord(message.cleanContent)) ||
+					(await isWord(message.content))
+				)
+			) {
+				const embed = new MessageEmbed()
+					.setTitle("Not a word!")
+					.setDescription(`\`${word}\` is not a word!`);
+
+				return await reject(embed);
+			}
+
+			if (thisGame.minLength && word.length < thisGame.minLength) {
+				const embed = new MessageEmbed()
+					.setTitle("Too short!")
+					.setDescription(
+						`\`${word}\` is less than ${thisGame.minLength} characters! ` +
+							"Try to be a bit more creative :P",
+					);
+
+				return await reject(embed);
+			}
+
+			const GameDatabase = gameDatabases[thisGame.name];
+
+			if (!GameDatabase) return;
+
+			const lastWord = await GameDatabase.findOne({ guild: message.guild.id })
+				.sort({ index: -1 })
+				.exec();
+
+			if (thisGame.manualCheck) {
+				const manualCheckResult = thisGame.manualCheck(word, lastWord ?? undefined);
+
+				if (manualCheckResult !== true) return await reject(manualCheckResult);
+			}
+
+			if (
+				message.guild.id !== "823941138653773868" &&
+				!thisGame.twiceInRow &&
+				lastWord?.author === author.id
+			) {
+				const embed = new MessageEmbed()
+					.setTitle("Posting twice in a row!")
+					.setDescription("No posting twice in a row allowed!");
+
+				return await reject(embed);
+			}
+
+			if (!thisGame.duplicates) {
+				// Determine if it has been used before
+				const used = await GameDatabase.findOne({ guild: message.guild.id, word }).exec();
+
+				if (used) {
+					const usedMessage = await message.channel.messages
+						.fetch(used.id)
+						.catch(() => false);
+
+					if (typeof usedMessage !== "object") return;
+
+					return await reject(
+						new MessageEmbed()
+							.setTitle("Duplicate word!")
+							.setDescription(
+								`\`${word}\` has [been used before](https://discord.com/channels/${
+									usedMessage.guild?.id || ""
+								}/${usedMessage.channel.id}/${used.id}) by <@${used.author}>!`,
+							)
+							.setThumbnail(
+								(await Discord.users.fetch(used.author)).displayAvatarURL(),
+							),
+					);
+				}
+			}
+
+			// All checks out, add to db
+			await Promise.all([
+				new GameDatabase({
+					author: author.id,
+					guild: message.guild.id,
+					id: message.id,
+					index: (lastWord?.index ?? -1) + 1,
+					word,
+				}).save(),
+				message.react("👍"),
+			]);
+		} catch (error) {
+			await handleError(error, async (data) => {
+				await ruleChannel.send(data);
+			});
+		}
+	})
+	.on("interactionCreate", async (interaction) => {
+		if (!interaction.isCommand())
+			throw new Error(`Someone (${interaction.user.toString()}) used a button`);
+
+		try {
+			switch (interaction.commandName) {
+				case "ping": {
+					return await interaction.reply({ content: "Pong!", ephemeral: true });
+				}
+				case "invite": {
+					return await interaction.reply({
+						content: `https://discord.com/api/oauth2/authorize?client_id=${
+							Discord.user?.id || ""
+						}&permissions=2147838016&scope=bot%20applications.commands`,
+
+						ephemeral: true,
+					});
+				}
+			}
+
+			if (!interaction.guild || !interaction.channel || !("guild" in interaction.channel)) {
+				return await interaction.reply({
+					content: "This command is not supported in DMs, sorry!",
+					ephemeral: true,
+				});
+			}
+
+			if (!interaction.member || !("permissionsIn" in interaction.member))
+				throw new Error("Could not find member permissions");
+
+			const guildInfo = await GuildDatabase.findOne({ id: interaction.guild.id });
+
+			switch (interaction.commandName) {
+				case "set-last": {
+					if (!guildInfo) {
+						return await interaction.reply({
+							content: "This server does not have any games set up!",
+							ephemeral: true,
+						});
+					}
+
+					if (
+						!interaction.member
+							.permissionsIn(interaction.channel)
+							.has("MANAGE_MESSAGES")
+					) {
+						return await interaction.reply({
+							content: "You are lacking Manage Messages permission, sorry!",
+							ephemeral: true,
+						});
+					}
+
+					const last = interaction.options.getString("message");
+
+					if (!last) {
+						return await interaction.reply({
+							content: "Please specify what to force-post!",
+							ephemeral: true,
+						});
+					}
+
+					const game = games.find(
+						({ name }) => guildInfo[`${name}`] === interaction.channel?.id,
+					);
+
+					if (!game) {
+						return await interaction.reply({
+							content: "There are no games in this channel!",
+							ephemeral: true,
+						});
+					}
+
+					const GameDatabase = gameDatabases[game.name];
+
+					if (!GameDatabase) throw new Error("Game is missing a database");
+
+					const message = await interaction.reply({
+						content: last.replaceAll(/(?<character>[*<_`|~])/g, "\\$<character>"),
+						fetchReply: true,
+					});
+
+					/** @type {Promise<any>[]} */
+					const promises = [
+						new GameDatabase({
+							author: Discord.user?.id,
+							guild: interaction.guild.id,
+							id: message.id,
+
+							index:
+								((
+									await GameDatabase.findOne({ guild: interaction.guild.id })
+										.sort({ index: -1 })
+										.exec()
+								)?.index ?? -1) + 1,
+
+							word: last,
+						}).save(),
+					];
+
+					if ("react" in message) promises.push(message?.react("👍"));
+
+					await Promise.all(promises);
+
+					break;
+				}
+
+				case "set-game": {
+					if (
+						!interaction.member
+							?.permissionsIn?.(interaction.channel)
+							.has("MANAGE_GUILD")
+					) {
+						return await interaction.reply({
+							content: "You are lacking Manage Server permission, sorry!",
+							ephemeral: true,
+						});
+					}
+
+					const game = interaction.options.getString("game");
+
+					if (!game) {
+						return await interaction.reply({
+							content: "Please specify a game!",
+							ephemeral: true,
+						});
+					}
+
+					if (guildInfo) {
+						if (
+							Object.values({ ...guildInfo, id: undefined }).includes(
+								interaction.channel?.id,
+							)
+						) {
+							return await interaction.reply({
+								content: "This channel is already in use!",
+								ephemeral: true,
+							});
+						}
+
+						await GuildDatabase.updateOne(
+							{ id: interaction.guild.id },
+							{ [game]: interaction.channel?.id },
+						);
+					} else {
+						await new GuildDatabase({
+							[game]: interaction.channel?.id,
+							id: interaction.guild.id,
+						}).save();
+					}
+
+					return await interaction.reply({
+						content: `This channel has been initialized for a game of ${game}!`,
+					});
+				}
+				case "set-logs": {
+					if (
+						!interaction.member
+							?.permissionsIn?.(interaction.channel)
+							.has("MANAGE_GUILD")
+					) {
+						return await interaction.reply({
+							content: "You are lacking Manage Server permission, sorry!",
+							ephemeral: true,
+						});
+					}
+
+					const game = interaction.options.getString("game");
+
+					if (game) {
+						if (guildInfo) {
+							if (
+								Object.entries({ ...guildInfo, id: undefined }).some(
+									(item) =>
+										!item[0].startsWith("logs_") &&
+										item[1] === interaction.channel?.id,
+								)
+							) {
+								return await interaction.reply({
+									content: "This channel is already in use!",
+									ephemeral: true,
+								});
+							}
+
+							await GuildDatabase.updateOne(
+								{ id: interaction.guild.id },
+								{ [`logs_${game}`]: interaction.channel?.id },
+							);
+						} else {
+							await new GuildDatabase({
+								id: interaction.guild.id,
+								[`logs_${game}`]: interaction.channel?.id,
+							}).save();
+						}
+
+						return await interaction.reply({
+							content: `Logs for ${game} will be posted here!`,
+						});
+					}
+
+					await Promise.all([
+						guildInfo
+							? GuildDatabase.updateOne(
+									{ id: interaction.guild.id },
+									{ logs: interaction.channel?.id },
+							  )
+							: new GuildDatabase({
+									id: interaction.guild.id,
+									logs: interaction.channel?.id,
+							  }).save(),
+						interaction.reply({
+							content: "Logs will be posted here if no game-specific channel is set!",
+						}),
+					]);
+				}
+			}
+		} catch (error) {
+			await handleError(
+				error,
+				async (data) => await interaction.reply({ ...data, ephemeral: true }),
+			);
+		}
+	})
+	.login(process.env.BOT_TOKEN || "")
+	.catch((error) => {
+		throw new Error(error);
+	});

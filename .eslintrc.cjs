@@ -1,41 +1,38 @@
+/** @file ESLint Configuration file. */
 "use strict";
 
-/** @file ESLint Configuration file. */
-
-module.exports = {
-	extends: ["plugin:@onedotprojects/recommended", "plugin:@onedotprojects/node"],
-
-	parserOptions: { ecmaVersion: 12 },
-
-	rules: {
-		"node/no-unsupported-features/es-syntax": 0,
-	},
-
-	ignorePatterns: ["*.ts", "**.ts"],
+/** @type {import("eslint").Linter.Config} */
+const config = {
+	extends: ["plugin:@redguy12/recommended", "plugin:@redguy12/node"],
 
 	overrides: [
 		{
-			extends: ["plugin:@onedotprojects/esm"],
-			files: ["**.js", "*.js", "**.mjs", "*.mjs"],
+			files: ["!**.md/*"],
+			parserOptions: { project: "./jsconfig.json" },
 		},
+
 		{
-			extends: ["plugin:@onedotprojects/cli"],
-
-			files: [".github/workflows/*.js"],
-
-			rules: {
-				"import/no-extraneous-dependencies": [
-					2,
-					{
-						bundledDependencies: false,
-						devDependencies: true,
-						optionalDependencies: false,
-						peerDependencies: false,
-					},
-				],
-			},
+			extends: ["plugin:@redguy12/esm"],
+			files: ["**.js"],
 		},
 	],
 
+	parserOptions: { ecmaVersion: "latest" },
 	root: true,
+
+	rules: {
+		"id-length": [
+			2,
+			{
+				exceptions: ["_", "id"],
+				max: 20,
+				min: 3,
+			},
+		],
+
+		"no-console": 0,
+		"no-underscore-dangle": [2, { allow: ["_id"], enforceInMethodNames: true }],
+	},
 };
+
+module.exports = config;
