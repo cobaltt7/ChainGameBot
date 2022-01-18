@@ -34,7 +34,7 @@
 		"@redguy12/prettier-config": "1.0.0",
 		"@shopify/eslint-plugin": "41.0.1",
 		"@types/eslint": "8.2.2",
-		"@types/node": "^16.11.11",
+		"@types/node": "^17.0.10",
 		"@typescript-eslint/eslint-plugin": "5.9.0",
 		"eslint": "8.5.0",
 		"eslint-config-hardcore": "23.6.2",
