@@ -1,6 +1,6 @@
 /** @file Main Logic. */
 import fileSystem from "fs";
-import { fileUrlToPath } from "url";
+import url from "url";
 
 import { Client, Intents as intents, MessageEmbed } from "discord.js";
 import dotenv from "dotenv";
@@ -30,7 +30,7 @@ const gameDatabases = {};
 
 const games = await Promise.all(
 	fileSystem
-		.readdirSync(fileUrlToPath(new URL("./games", import.meta.url).toString()))
+		.readdirSync(url.fileURLToPath(new URL("./games", import.meta.url).toString()))
 		.map(
 			async (file) =>
 				(
