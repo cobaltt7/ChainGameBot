@@ -193,7 +193,8 @@ Discord.on("ready", async () => {
 
 		const ruleChannel = await Discord.channels.fetch(logChannelId);
 
-		if (!ruleChannel?.isText()) return;
+		if (!ruleChannel?.isText())
+			throw new Error(`Log channel ${logChannelId} is not a text channel!`);
 
 		/**
 		 * Reject a message posted as invalid.
@@ -202,9 +203,12 @@ Discord.on("ready", async () => {
 		 *   set on this message will be overwritten.
 		 */
 		async function reject(embed) {
-			embed.setAuthor(author.tag, author.displayAvatarURL());
+			embed.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL() });
 
-			if (!ruleChannel?.isText()) return;
+			if (!ruleChannel?.isText())
+				throw new Error(
+					`Log channel ${ruleChannel?.id || "[unknown]"} is not a text channel!`,
+				);
 
 			await Promise.all([
 				message.delete(),
@@ -216,9 +220,13 @@ Discord.on("ready", async () => {
 		}
 
 		try {
-			const word = message.cleanContent.toLowerCase().trim().replaceAll("`", "'");
+			const word = message.cleanContent
+				.normalize("NFD")
+				.toLowerCase()
+				.trim()
+				.replaceAll("`", "'");
 
-			if (thisGame.match && !thisGame.match.test(word)) {
+			if (thisGame.match && !new RegExp(thisGame.match).test(word)) {
 				const embed = new MessageEmbed()
 					.setTitle("Invalid character sent!")
 					.setDescription(`\`${word}\` contains invalid characters!`);
@@ -255,8 +263,7 @@ Discord.on("ready", async () => {
 
 			const GameDatabase = gameDatabases[thisGame.name];
 
-			if (!GameDatabase) return;
-
+			if (!GameDatabase) throw new Error(`Game database ${thisGame.name} not found!`);
 			const lastWord = await GameDatabase.findOne({ guild: message.guild.id })
 				.sort({ index: -1 })
 				.exec();
@@ -288,20 +295,20 @@ Discord.on("ready", async () => {
 						.fetch(used.id)
 						.catch(() => false);
 
-					if (typeof usedMessage !== "object") return;
-
-					return await reject(
-						new MessageEmbed()
-							.setTitle("Duplicate word!")
-							.setDescription(
-								`\`${word}\` has [been used before](https://discord.com/channels/${
-									usedMessage.guild?.id || ""
-								}/${usedMessage.channel.id}/${used.id}) by <@${used.author}>!`,
-							)
-							.setThumbnail(
-								(await Discord.users.fetch(used.author)).displayAvatarURL(),
-							),
-					);
+					if (typeof usedMessage === "object") {
+						await reject(
+							new MessageEmbed()
+								.setTitle("Duplicate word!")
+								.setDescription(
+									`\`${word}\` has [been used before](https://discord.com/channels/${
+										usedMessage.guild?.id || ""
+									}/${usedMessage.channel.id}/${used.id}) by <@${used.author}>!`,
+								)
+								.setThumbnail(
+									(await Discord.users.fetch(used.author)).displayAvatarURL(),
+								),
+						);
+					}
 				}
 			}
 

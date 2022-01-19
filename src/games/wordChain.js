@@ -19,7 +19,7 @@ const command = {
 	},
 
 	match: /^[\d '\u00A0-\uD7FF\uFA6E-\uFDCF\p{L}-]+$/gimu,
-	minLength: 4,
+	minLength: 3,
 	name: "Word Chain",
 	twiceInRow: process.env.NODE_ENV !== "production",
 	validWordsOnly: true,
