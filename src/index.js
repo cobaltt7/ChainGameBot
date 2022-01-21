@@ -296,7 +296,7 @@ Discord.on("ready", async () => {
 						.catch(() => false);
 
 					if (typeof usedMessage === "object") {
-						await reject(
+						return await reject(
 							new MessageEmbed()
 								.setTitle("Duplicate word!")
 								.setDescription(
