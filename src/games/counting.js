@@ -6,7 +6,7 @@ const command = {
 	duplicates: true,
 
 	manualCheck(number, last) {
-		const lastNumber = Math.max(+(last?.word || 0) || 0, 0);
+		const lastNumber = Math.floor(Math.max(+(last?.word || 0) || 0, 0));
 
 		if (+number !== lastNumber + 1) {
 			return new MessageEmbed()
@@ -17,7 +17,7 @@ const command = {
 		return true;
 	},
 
-	match: /^\d+$/,
+	match: /^[\d+.-]+$/,
 	name: "Counting",
 	twiceInRow: process.env.NODE_ENV !== "production",
 	validWordsOnly: false,
