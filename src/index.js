@@ -110,10 +110,11 @@ const Discord = new Client({
  * @param {unknown} error - Error.
  * @param {(options: import("discord.js").MessageOptions) => Promise<void>} send - Function that
  *   posts the error.
+ * @param {string} channel - Channel where the error occurred.
  *
  * @returns {Promise<void[] | void>} - Nothing of value.
  */
-async function handleError(error, send) {
+async function handleError(error, send, channel) {
 	try {
 		console.error(error);
 
@@ -128,7 +129,7 @@ async function handleError(error, send) {
 
 		const promises = [
 			send({
-				content: "Join the support server linked in my bio!",
+				content: "This error has automatically been sent to the support server. If you can, please join it yourself so you can help debug this error! Link is in my bio.",
 				embeds: [embed],
 			}),
 		];
@@ -136,9 +137,10 @@ async function handleError(error, send) {
 		if (process.env.NODE_ENV === "production") {
 			promises.push(
 				(async () => {
-					const channel = await Discord.channels.fetch("897639265696112670");
+					const ruleChannel = await Discord.channels.fetch("897639265696112670");
 
-					if (channel?.isText()) await channel.send({ embeds: [embed] });
+					if (ruleChannel?.isText())
+						await ruleChannel.send({ content: `In ${channel}`, embeds: [embed] });
 				})(),
 			);
 		}
@@ -324,9 +326,13 @@ Discord.on("ready", async () => {
 				message.react("👍"),
 			]);
 		} catch (error) {
-			await handleError(error, async (data) => {
-				await ruleChannel.send(data);
-			});
+			await handleError(
+				error,
+				async (data) => {
+					await ruleChannel.send(data);
+				},
+				message.channel.toString(),
+			);
 		}
 	})
 	.on("interactionCreate", async (interaction) => {
@@ -548,6 +554,7 @@ Discord.on("ready", async () => {
 			await handleError(
 				error,
 				async (data) => await interaction.reply({ ...data, ephemeral: true }),
+				interaction.channel?.toString() || "",
 			);
 		}
 	})
