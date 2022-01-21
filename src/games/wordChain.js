@@ -9,7 +9,10 @@ const command = {
 		// Determine if it starts with the last letter of the previous word
 		const shouldStartWith = lastWord?.word.slice(-1).replace("`", "'");
 
-		if (shouldStartWith && shouldStartWith !== word[0]) {
+		if (
+			(shouldStartWith && shouldStartWith !== word[0]) ||
+			(word.includes(" ") && lastWord?.guild !== "774935082909433876")
+		) {
 			return new MessageEmbed()
 				.setTitle("Doesn't start with correct character!")
 				.setDescription(`\`${word}\` does not start with \`${shouldStartWith}\`!`);
