@@ -25,7 +25,7 @@
 		"axios": "0.25.0",
 		"discord-api-types": "0.26.1",
 		"discord.js": "13.6.0",
-		"dotenv": "14.2.0",
+		"dotenv": "14.3.0",
 		"mongoose": "6.1.8"
 	},
 	"devDependencies": {
