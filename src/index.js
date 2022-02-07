@@ -434,7 +434,7 @@ Discord.on("ready", async () => {
 						}).save(),
 					];
 
-					if ("react" in message) promises.push(message?.react("👍"));
+					if ("react" in message) promises.push(message?.react("👍").catch(()=>{}));
 
 					await Promise.all(promises);
 
