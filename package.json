@@ -67,11 +67,11 @@
 		"game"
 	],
 	"engines": {
-		"node": ">=16.6.0"
+		"node": "16.14.0"
 	},
 	"prettier": "@redguy12/prettier-config",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/RedGuy12/ShitoriBot.git"
+		"url": "git+https://github.com/RedGuy12/WordChainBot.git"
 	}
 }
