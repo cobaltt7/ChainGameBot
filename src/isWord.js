@@ -18,7 +18,7 @@ export default async function isWord(word) {
 		},
 
 		method: "GET",
-		url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${word}`,
+		url: `https://en.wiktionary.org/w/api.php?action=parse&summary=example&format=json&redirects=true&page=${encodeURIComponent(word)}`,
 	});
 
 	if (
