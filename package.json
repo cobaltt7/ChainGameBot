@@ -29,7 +29,7 @@
 		"mongoose": "6.2.4"
 	},
 	"devDependencies": {
-		"@redguy12/eslint-plugin": "3.1.1",
+		"@redguy12/eslint-plugin": "4.0.0",
 		"@redguy12/prettier-config": "1.0.0",
 		"@shopify/eslint-plugin": "41.0.1",
 		"@types/eslint": "8.4.0",
