@@ -315,6 +315,7 @@ Discord.on("ready", async () => {
 			}
 
 			// All checks out, add to db
+			  const now = Date.now() / 1000;
 			await Promise.all([
 				new GameDatabase({
 					author: author.id,
@@ -323,7 +324,7 @@ Discord.on("ready", async () => {
 					index: (lastWord?.index ?? -1) + 1,
 					word,
 				}).save(),
-				message.react("👍"),
+				message.react((now < 1712059200 && now > 1711886400)?"👎": "👍"),
 			]);
 		} catch (error) {
 			await handleError(
