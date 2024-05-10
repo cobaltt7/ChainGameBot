@@ -1,5 +1,5 @@
 /** @file A Game to post a word tht starts with the first letter of the previous word. */
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 /** @type {import("../../types").Game} */
 const command = {
@@ -13,7 +13,7 @@ const command = {
 			(shouldStartWith && shouldStartWith !== word[0]) ||
 			(word.includes(" ") && lastWord?.guild !== "774935082909433876")
 		) {
-			return new MessageEmbed()
+			return new EmbedBuilder()
 				.setTitle("Doesn't start with correct character!")
 				.setDescription(`\`${word}\` does not start with \`${shouldStartWith}\`!`);
 		}

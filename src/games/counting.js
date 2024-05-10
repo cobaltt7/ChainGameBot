@@ -1,5 +1,5 @@
 /** @file Game To count from 1 up. */
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 /** @type {import("../../types").Game} */
 const command = {
@@ -9,7 +9,7 @@ const command = {
 		const lastNumber = Math.floor(Math.max(+(last?.word || 0) || 0, 0));
 
 		if (+number !== lastNumber + 1) {
-			return new MessageEmbed()
+			return new EmbedBuilder()
 				.setTitle("Incorrect number!")
 				.setDescription(`\`${number}\` does not come after \`${lastNumber}\`!`);
 		}
