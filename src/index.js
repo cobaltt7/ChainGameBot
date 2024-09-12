@@ -129,7 +129,8 @@ async function handleError(error, send, channel) {
 
 		const promises = [
 			send({
-				content: "This error has automatically been sent to the support server. If you can, please join it yourself so you can help debug this error! Link is in my bio.",
+				content:
+					"This error has automatically been sent to the support server. If you can, please join it yourself so you can help debug this error! Link is in my bio.",
 				embeds: [embed],
 			}),
 		];
@@ -153,12 +154,18 @@ async function handleError(error, send, channel) {
 
 Discord.on("ready", async () => {
 	console.log("Connected to Discord with ID", Discord.application?.id);
-
-	if (process.env.NODE_ENV === "production") {
-		const channel = await Discord.channels.fetch("826457135415033867");
-
-		if (channel?.isText()) await channel.send("Bot online!");
-	}
+	console.log(
+		await Promise.all(
+			(
+				await Discord.guilds.fetch()
+			).map(async (fn) => [
+				fn.id,
+				fn.name,
+				(await (await fn.fetch()).fetchOwner()).user.tag,
+				(await fn.fetch()).memberCount,
+			]),
+		),
+	);
 })
 	.on("disconnect", () => console.warn("Disconnected from Discord"))
 	.on("debug", console.debug)
@@ -186,17 +193,11 @@ Discord.on("ready", async () => {
 		if (!guildInfo) return;
 
 		const thisGame = games.find((game) => guildInfo[game.name] === message.channel.id);
-
 		if (!thisGame) return;
 
 		const logChannelId = guildInfo[`logs_${thisGame.name}`] || guildInfo.logs;
 
-		if (!logChannelId) return;
-
-		const ruleChannel = await Discord.channels.fetch(logChannelId);
-
-		if (!ruleChannel?.isText())
-			throw new Error(`Log channel ${logChannelId} is not a text channel!`);
+		const ruleChannel = logChannelId ? await Discord.channels.fetch(logChannelId) : null;
 
 		/**
 		 * Reject a message posted as invalid.
@@ -207,18 +208,16 @@ Discord.on("ready", async () => {
 		async function reject(embed) {
 			embed.setAuthor({ name: author.tag, iconURL: author.displayAvatarURL() });
 
-			if (!ruleChannel?.isText())
-				throw new Error(
-					`Log channel ${ruleChannel?.id || "[unknown]"} is not a text channel!`,
+			const promises = [message.delete(), ,];
+			if (ruleChannel?.isText())
+				promises.push(
+					ruleChannel.send({
+						content: `${author.toString()} | <#${message.channel.id}>`,
+						embeds: [embed],
+					}),
 				);
 
-			await Promise.all([
-				message.delete(),
-				ruleChannel.send({
-					content: `${author.toString()} | <#${message.channel.id}>`,
-					embeds: [embed],
-				}),
-			]);
+			await Promise.all(promises);
 		}
 
 		try {
@@ -314,6 +313,7 @@ Discord.on("ready", async () => {
 				}
 			}
 
+			const now = Date.now() / 1000
 			// All checks out, add to db
 			await Promise.all([
 				new GameDatabase({
@@ -323,13 +323,13 @@ Discord.on("ready", async () => {
 					index: (lastWord?.index ?? -1) + 1,
 					word,
 				}).save(),
-				message.react("👍"),
+				message.react((now < 1712059200 && now > 1711886400)?"👎": "👍"),
 			]);
 		} catch (error) {
 			await handleError(
 				error,
 				async (data) => {
-					await ruleChannel.send(data);
+					await (ruleChannel?.isText() ? ruleChannel : message.channel)?.send(data);
 				},
 				message.channel.toString(),
 			);
@@ -340,21 +340,6 @@ Discord.on("ready", async () => {
 			throw new Error(`Someone (${interaction.user.toString()}) used a button`);
 
 		try {
-			switch (interaction.commandName) {
-				case "ping": {
-					return await interaction.reply({ content: "Pong!", ephemeral: true });
-				}
-				case "invite": {
-					return await interaction.reply({
-						content: `https://discord.com/api/oauth2/authorize?client_id=${
-							Discord.user?.id || ""
-						}&permissions=2147838016&scope=bot%20applications.commands`,
-
-						ephemeral: true,
-					});
-				}
-			}
-
 			if (!interaction.guild || !interaction.channel || !("guild" in interaction.channel)) {
 				return await interaction.reply({
 					content: "This command is not supported in DMs, sorry!",
@@ -434,7 +419,8 @@ Discord.on("ready", async () => {
 						}).save(),
 					];
 
-					if ("react" in message) promises.push(message?.react("👍").catch(()=>{}));
+					const now = Date.now() / 1000
+					if ("react" in message) promises.push(message?.react((now < 1712059200 && now > 1711886400)?"👎": "👍").catch(() => {}));
 
 					await Promise.all(promises);
 

@@ -15,11 +15,6 @@ const games = await Promise.all(
 );
 
 const commands = [
-	new SlashCommandBuilder().setName("ping").setDescription("Show ping info"),
-	new SlashCommandBuilder().setName("invite").setDescription("Invite the bot"),
-	// New SlashCommandBuilder()
-	// 	.setName("dashboard")
-	// 	.setDescription("Configure the bot on the dashboard"),
 	new SlashCommandBuilder()
 		.setName("set-game")
 		.setDescription("Initiate game in this channel")

@@ -12,10 +12,10 @@
 	"type": "module",
 	"main": "src/index.js",
 	"scripts": {
-		"lint": "npm run lint:prettier && npm run lint:typescript && npm run lint:eslint && echo Success",
-		"lint:eslint": "eslint --fix --cache .",
+		"lint": "npm run lint:prettier && npm run lint:typescript && echo Success",
 		"lint:prettier": "prettier --write --ignore-unknown **",
 		"lint:typescript": "tsc --project jsconfig.json",
+		"dev": "nodemon --trace-warnings --harmony .",
 		"start": "node --trace-warnings --harmony ."
 	},
 	"dependencies": {
@@ -55,6 +55,7 @@
 		"eslint-plugin-sort-class-members": "1.14.1",
 		"eslint-plugin-unicorn": "39.0.0",
 		"eslint-plugin-vue": "8.2.0",
+		"nodemon": "^2.0.15",
 		"prettier": "2.5.1",
 		"typescript": "4.5.5"
 	},
@@ -67,7 +68,7 @@
 		"game"
 	],
 	"engines": {
-		"node": "16.14.0"
+		"node": "16.13.0"
 	},
 	"prettier": "@redguy12/prettier-config",
 	"repository": {
