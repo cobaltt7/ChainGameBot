@@ -35,10 +35,10 @@ export default async function configOuijaBoard(
 				title: "Ouija Board Settings",
 				color: constants.themeColor,
 				description:
-					`**Channel**: ${channelMention(config.channel)}\n` +
-					`**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n` +
-					`**React**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n` +
-					`**Completion Message**: ${inlineCode(config.complete)}`,
+					`**Channel**: ${channelMention(config.channel)}\n`
+					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
+					+ `**React**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n`
+					+ `**Completion Message**: ${inlineCode(config.complete)}`,
 			},
 		],
 	});

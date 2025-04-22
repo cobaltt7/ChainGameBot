@@ -69,8 +69,8 @@ export default async function handleCounting(message: Message): Promise<void> {
 		if (config.reset)
 			await config.updateOne({ lastNumber: 0, lastAuthor: null, lastId: message.id }).exec();
 		if (
-			!logs &&
-			message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
+			!logs
+			&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
 		)
 			await message.react("👎");
 		await reject(

@@ -15,8 +15,8 @@ import { ChatConsent } from "./misc.ts";
 async function getSettings(user: User): Promise<string> {
 	const consent = await ChatConsent.findOne({ user: user.id }).exec();
 	const overrides =
-		consent?.guilds.size &&
-		Array.from(consent.guilds.entries(), async ([id, status]) => {
+		consent?.guilds.size
+		&& Array.from(consent.guilds.entries(), async ([id, status]) => {
 			const server = await client.guilds.fetch(id).catch(() => void 0);
 			return `${hyperlink(
 				server?.name ?? `Unknown server ${id}`,
@@ -51,11 +51,11 @@ function createButtons(inGuild: boolean): ActionRowData<InteractionButtonCompone
 export async function showConsent(interaction: ChatInputCommandInteraction): Promise<void> {
 	await interaction.reply({
 		content:
-			`## CGB Chat\n` +
-			`### Basic regurgitating chatbot\n` +
-			`CGB Chat learns by tracking messages across all channels. Any stored messages may be regurgitated, but only in the server you sent it in. Messages will never be sent cross-server.\n` +
-			`Your messages will only be stored if you give explicit permission using the button below. You will be able to change your preference at any time, however any past messages can’t be deleted, as message authors are not stored. By default, your messages are not saved.\n` +
-			`${await getSettings(interaction.user)}${
+			`## CGB Chat\n`
+			+ `### Basic regurgitating chatbot\n`
+			+ `CGB Chat learns by tracking messages across all channels. Any stored messages may be regurgitated, but only in the server you sent it in. Messages will never be sent cross-server.\n`
+			+ `Your messages will only be stored if you give explicit permission using the button below. You will be able to change your preference at any time, however any past messages can’t be deleted, as message authors are not stored. By default, your messages are not saved.\n`
+			+ `${await getSettings(interaction.user)}${
 				interaction.inGuild() ? "" : (
 					"\n\n**Changing your settings here will change your default preference in all servers!** You are still able to override the choice below on a per-server basis."
 				)

@@ -54,19 +54,19 @@ export default async function configCounting(
 				title: "Counting Settings",
 				color: constants.themeColor,
 				description:
-					`**Channel**: ${channelMention(config.channel)}\n` +
-					`**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n` +
-					`**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n` +
-					`**Base**: ${config.base.toLocaleString()}\n` +
-					`**Step**: ${config.step.toLocaleString()}\n` +
-					`**Reset on Invalid**: ${
+					`**Channel**: ${channelMention(config.channel)}\n`
+					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
+					+ `**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
+					+ `**Base**: ${config.base.toLocaleString()}\n`
+					+ `**Step**: ${config.step.toLocaleString()}\n`
+					+ `**Reset on Invalid**: ${
 						constants.emojis.statuses[config.reset ? "yes" : "no"]
-					}\n\n` +
-					`*Last Number: ${
+					}\n\n`
+					+ `*Last Number: ${
 						(lastLink ?
 							hyperlink(stringifyNumber(config.lastNumber, config.base), lastLink)
-						:	stringifyNumber(config.lastNumber, config.base)) +
-						(config.lastAuthor ? ` by ${userMention(config.lastAuthor)}` : "")
+						:	stringifyNumber(config.lastNumber, config.base))
+						+ (config.lastAuthor ? ` by ${userMention(config.lastAuthor)}` : "")
 					}*`,
 			},
 		],

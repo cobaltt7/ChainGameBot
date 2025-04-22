@@ -47,10 +47,7 @@ defineChatCommand(
 	configChat,
 );
 defineChatCommand(
-	{
-		name: "allow-cgb-chat",
-		description: "Allow CGB to save your messages for use in CGB Chat",
-	},
+	{ name: "allow-cgb-chat", description: "Allow CGB to save your messages for use in CGB Chat" },
 	showConsent,
 );
 defineButton("allowChat", allowChat);
