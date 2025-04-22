@@ -116,12 +116,12 @@ export function preProcessResponse(message: Message): string | undefined {
 		.trim();
 
 	if (
-		response === "" ||
-		response.length > 500 ||
-		response.split("\n").length > 5 ||
-		response.match(InvitesPattern)?.length ||
-		response.match(GlobalGuildTemplatesPattern)?.length ||
-		response.match(GlobalBotInvitesPattern)?.length
+		response === ""
+		|| response.length > 500
+		|| response.split("\n").length > 5
+		|| response.match(InvitesPattern)?.length
+		|| response.match(GlobalGuildTemplatesPattern)?.length
+		|| response.match(GlobalBotInvitesPattern)?.length
 	)
 		return;
 
@@ -143,15 +143,15 @@ async function replaceChannels(response: string, guild: Guild): Promise<string> 
 
 	const channels = (await guild.channels.fetch()).filter(
 		(channel): channel is Exclude<NonNullable<typeof channel>, CategoryChannel> =>
-			channel?.type !== ChannelType.GuildCategory &&
-			!!channel
+			channel?.type !== ChannelType.GuildCategory
+			&& !!channel
 				?.permissionsFor(guild.roles.everyone)
 				.has(PermissionFlagsBits.ViewChannel | PermissionFlagsBits.ReadMessageHistory),
 	);
 	const threads = (await guild.channels.fetchActiveThreads()).threads.filter(
 		(channel): channel is Exclude<typeof channel, PrivateThreadChannel> =>
-			channel.type !== ChannelType.PrivateThread &&
-			!!channel
+			channel.type !== ChannelType.PrivateThread
+			&& !!channel
 				.permissionsFor(guild.roles.everyone)
 				.has(PermissionFlagsBits.ViewChannel | PermissionFlagsBits.ReadMessageHistory),
 	);

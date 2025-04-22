@@ -43,8 +43,8 @@ export function messageToText(
 	references = true,
 ): Awaitable<string> {
 	const loadingMessage =
-		message.flags.has("Loading") &&
-		((Date.now() - message.createdTimestamp) / 1000 / 60 > 15 ?
+		message.flags.has("Loading")
+		&& ((Date.now() - message.createdTimestamp) / 1000 / 60 > 15 ?
 			`${constants.emojis.message.error} The application did not respond`
 		:	`${constants.emojis.message.loading} ${escapeAllMarkdown(
 				message.author?.displayName ?? "The application",
@@ -61,8 +61,8 @@ export function messageToText(
 		.join("\n\n");
 
 	const content =
-		loadingMessage ||
-		(snapshots && message.content ?
+		loadingMessage
+		|| (snapshots && message.content ?
 			`${snapshots}\n\n${message.content}`
 		:	snapshots || message.content);
 
@@ -300,8 +300,8 @@ export function messageToText(
 					"flagged"
 				:	"blocked"
 			} a message in ${channelMention(
-				message.embeds[0]?.fields.find(({ name }) => name === "channel_id")?.value ??
-					message.channel.id,
+				message.embeds[0]?.fields.find(({ name }) => name === "channel_id")?.value
+					?? message.channel.id,
 			)}`;
 		}
 		case MessageType.RoleSubscriptionPurchase: {

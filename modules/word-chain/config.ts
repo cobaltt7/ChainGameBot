@@ -55,13 +55,13 @@ export default async function configWordChain(
 				title: "Word Chain Settings",
 				color: constants.themeColor,
 				description:
-					`**Channel**: ${channelMention(config.channel)}\n` +
-					`**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n` +
-					`**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n` +
-					`**Phrases**: ${constants.emojis.statuses[config.phrases ? "yes" : "no"]}\n` +
-					`**Language**: ${
-						formatLanguageName(config.language) ||
-						`${constants.emojis.statuses.no} *Unknown language!*`
+					`**Channel**: ${channelMention(config.channel)}\n`
+					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
+					+ `**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
+					+ `**Phrases**: ${constants.emojis.statuses[config.phrases ? "yes" : "no"]}\n`
+					+ `**Language**: ${
+						formatLanguageName(config.language)
+						|| `${constants.emojis.statuses.no} *Unknown language!*`
 					}${
 						latest ?
 							`\n\n*Last Word: ${hyperlink(
@@ -166,8 +166,8 @@ export async function resetChannelConfirm(
 	await interaction.reply({
 		ephemeral: true,
 		content:
-			`**Are you sure** you want to **reset all words** used in ${channelMention(channelId)}? **This is irreversible.** All words ever used in this channel will be **permamently wiped from the database.**\n` +
-			"Alternatively, you can create and configure a new channel for Word Chain, and the words used here will not transfer over.",
+			`**Are you sure** you want to **reset all words** used in ${channelMention(channelId)}? **This is irreversible.** All words ever used in this channel will be **permamently wiped from the database.**\n`
+			+ "Alternatively, you can create and configure a new channel for Word Chain, and the words used here will not transfer over.",
 		components: [
 			{
 				type: ComponentType.ActionRow,

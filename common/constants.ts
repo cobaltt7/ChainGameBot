@@ -8,9 +8,7 @@ const env =
 export default {
 	collectorTime: 45_000,
 
-	channels: {
-		logs: "897639265696112670",
-	},
+	channels: { logs: "897639265696112670" },
 
 	emojis: {
 		message: {
@@ -45,7 +43,5 @@ export default {
 	testingServer: "823941138653773868",
 	themeColor: 0xe9_ea_ea,
 
-	users: {
-		bot: "823932474118635540",
-	},
+	users: { bot: "823932474118635540" },
 } as const;

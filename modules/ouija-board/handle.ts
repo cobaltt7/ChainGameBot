@@ -67,8 +67,8 @@ export async function handleOujia(message: Message): Promise<void> {
 	await ouija.save();
 
 	if (
-		config?.react &&
-		message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
+		config?.react
+		&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
 	)
 		await message.react("👍");
 }

@@ -23,10 +23,10 @@ import { postProcessResponse, preProcessResponse, processPrompt } from "./proces
 
 export default async function sendChat(message: Message<true>): Promise<string | undefined> {
 	if (
-		!message.member ||
-		message.author.id === client.user.id ||
-		(!message.mentions.has(client.user) &&
-			message.mentions.users.size > (message.mentions.has(message.author) ? 1 : 0))
+		!message.member
+		|| message.author.id === client.user.id
+		|| (!message.mentions.has(client.user)
+			&& message.mentions.users.size > (message.mentions.has(message.author) ? 1 : 0))
 	)
 		return;
 
@@ -59,8 +59,8 @@ export async function learn(message: Message<true>): Promise<void> {
 	const previous = previousMessages[message.channel.id];
 	previousMessages[message.channel.id] = message;
 	if (
-		message.interactionMetadata ||
-		[message.author.id, previous?.author.id].includes(client.user.id)
+		message.interactionMetadata
+		|| [message.author.id, previous?.author.id].includes(client.user.id)
 	)
 		return;
 
@@ -69,10 +69,10 @@ export async function learn(message: Message<true>): Promise<void> {
 
 	const baseChannel = getBaseChannel(message.channel);
 	if (
-		message.channel.type === ChannelType.PrivateThread ||
-		!baseChannel ||
-		baseChannel.isDMBased() ||
-		!baseChannel.permissionsFor(baseChannel.guild.id)?.has(PermissionFlagsBits.ViewChannel)
+		message.channel.type === ChannelType.PrivateThread
+		|| !baseChannel
+		|| baseChannel.isDMBased()
+		|| !baseChannel.permissionsFor(baseChannel.guild.id)?.has(PermissionFlagsBits.ViewChannel)
 	)
 		return;
 

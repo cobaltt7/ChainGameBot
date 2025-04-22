@@ -117,8 +117,8 @@ export default async function handleWordChain(message: Message): Promise<void> {
 	const duplicate = await Word.findOne({ channel: message.channel.id, word: current }).exec();
 	if (duplicate) {
 		if (
-			!logs &&
-			message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
+			!logs
+			&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
 		)
 			await message.react("👎");
 		await reject(
