@@ -26,9 +26,9 @@ import { formatDuration } from "./numbers.ts";
 import { truncateText } from "./text.ts";
 
 /**
- * A property that returns the content that is rendered regardless of the {@link Message.type}. In some cases, this just
- * returns the regular {@link Message.content}. Otherwise this returns an English message denoting the contents of the
- * system message.
+ * A property that returns the content that is rendered regardless of the {@link Message.type}. In
+ * some cases, this just returns the regular {@link Message.content}. Otherwise this returns an
+ * English message denoting the contents of the system message.
  *
  * @author Based Off of [Rapptz/discord.py’s
  *   `system_content`](https://github.com/Rapptz/discord.py/blob/7db879b/discord/message.py#L239-L2814)
