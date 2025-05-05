@@ -132,8 +132,7 @@ export async function setLastLetter(
 	interaction: ModalSubmitInteraction,
 	channelId: string,
 ): Promise<void> {
-	const letter =
-		normalize(interaction.fields.getTextInputValue("letter"))[0] ?? "";
+	const letter = normalize(interaction.fields.getTextInputValue("letter"))[0] ?? "";
 
 	const channel = await interaction.guild?.channels
 		.fetch(channelId)
