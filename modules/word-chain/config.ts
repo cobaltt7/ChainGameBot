@@ -133,7 +133,7 @@ export async function setLastLetter(
 	channelId: string,
 ): Promise<void> {
 	const letter =
-		normalize(interaction.fields.getTextInputValue("letter")).toUpperCase().at(-1) ?? "";
+		normalize(interaction.fields.getTextInputValue("letter"))[0] ?? "";
 
 	const channel = await interaction.guild?.channels
 		.fetch(channelId)
@@ -153,7 +153,7 @@ export async function setLastLetter(
 	await interaction.reply(
 		`${constants.emojis.statuses.yes} Set the last letter in ${channelMention(
 			channelId,
-		)} to ${letter}!`,
+		)} to ${letter.toUpperCase()}!`,
 	);
 }
 
