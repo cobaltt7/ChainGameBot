@@ -70,7 +70,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 	}
 
 	const word = stripMarkdown(message.cleanContent.normalize("NFC"));
-	if (!config.phrases && /[\d\s#&+./:;<=>?@[\\\]_`{|}~\uD800\uFFFD]/.test(word)) {
+	if (!config.phrases && /[\d\s#&+./:;<=>?@[\\\]_`{|}~\ud800\ufffd]/.test(word)) {
 		await reject(
 			`${
 				constants.emojis.statuses.no
