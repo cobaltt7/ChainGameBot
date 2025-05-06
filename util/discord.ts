@@ -465,8 +465,8 @@ export async function tryReact(
 		return await message.react(emoji);
 	} catch (error) {
 		if (
-			error instanceof DiscordAPIError &&
-			error.code === RESTJSONErrorCodes.ReactionWasBlocked
+			error instanceof DiscordAPIError
+			&& error.code === RESTJSONErrorCodes.ReactionWasBlocked
 		)
 			return;
 		throw error;
