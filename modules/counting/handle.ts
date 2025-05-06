@@ -1,11 +1,11 @@
 import type { Message } from "discord.js";
 
-import { channelMention, hyperlink, inlineCode, PermissionFlagsBits } from "discord.js";
+import { channelMention, hyperlink, inlineCode } from "discord.js";
 import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
 import { getLogChannel } from "../../common/misc.ts";
-import { assertSendable } from "../../util/discord.ts";
+import { assertSendable, tryReact } from "../../util/discord.ts";
 import { Counting, parseNumber, stringifyNumber } from "./misc.ts";
 
 export default async function handleCounting(message: Message): Promise<void> {
@@ -27,8 +27,7 @@ export default async function handleCounting(message: Message): Promise<void> {
 			);
 		} catch {}
 
-		if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-			await message.react(constants.emojis.statuses.no);
+		await tryReact(message, constants.emojis.statuses.no);
 
 		await config.updateOne({ enabled: false }).exec();
 		return;
@@ -68,11 +67,9 @@ export default async function handleCounting(message: Message): Promise<void> {
 	if (next !== current) {
 		if (config.reset)
 			await config.updateOne({ lastNumber: 0, lastAuthor: null, lastId: message.id }).exec();
-		if (
-			!logs
-			&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
-		)
-			await message.react("👎");
+
+		if (!logs) await tryReact(message, "👎");
+
 		await reject(
 			`${
 				constants.emojis.statuses.no
@@ -92,6 +89,5 @@ export default async function handleCounting(message: Message): Promise<void> {
 	await config
 		.updateOne({ lastNumber: next, lastAuthor: message.author.id, lastId: message.id })
 		.exec();
-	if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-		await message.react("👍");
+	await tryReact(message, "👍");
 }

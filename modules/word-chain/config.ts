@@ -16,16 +16,14 @@ import {
 	ComponentType,
 	hyperlink,
 	messageLink,
-	PermissionFlagsBits,
 	TextInputStyle,
 	userMention,
 } from "discord.js";
 import { matchSorter } from "match-sorter";
-import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
 import { displayLogChannel } from "../../common/misc.ts";
-import { assertSendable } from "../../util/discord.ts";
+import { assertSendable, tryReact } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
 import { formatLanguageName, languages, wikiSearchOptions, Word, WordChainConfig } from "./misc.ts";
 
@@ -139,13 +137,12 @@ export async function setLastLetter(
 		.catch(() => void 0)
 		.then((channel) => channel && assertSendable(channel));
 	const message = channel && (await channel.send(letter));
-	if (channel?.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-		await message?.react("👍");
+	if (message) await tryReact(message, "👍");
 
 	await new Word({
 		channel: channelId,
 		author: interaction.user.id,
-		word: letter,
+		word: letter.toLowerCase(),
 		id: (message ?? interaction).id,
 	}).save();
 

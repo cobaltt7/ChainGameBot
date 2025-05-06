@@ -15,15 +15,13 @@ import {
 	hyperlink,
 	inlineCode,
 	messageLink,
-	PermissionFlagsBits,
 	TextInputStyle,
 	userMention,
 } from "discord.js";
-import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
 import { displayLogChannel } from "../../common/misc.ts";
-import { assertSendable } from "../../util/discord.ts";
+import { assertSendable, tryReact } from "../../util/discord.ts";
 import { Counting, parseNumber, stringifyNumber } from "./misc.ts";
 
 export default async function configCounting(
@@ -144,8 +142,7 @@ export async function setLastNumber(
 		.fetch(channelId)
 		.then((channel) => channel && assertSendable(channel));
 	const message = channel && (await channel.send(number.toString(config.base).toUpperCase()));
-	if (channel?.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-		await message?.react("👍");
+	if (message) await tryReact(message, "👍");
 
 	await config
 		.updateOne({

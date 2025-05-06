@@ -63,8 +63,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 					)} server.`,
 				);
 			} catch {}
-		if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-			await message.react(constants.emojis.statuses.no);
+		await tryReact(message, constants.emojis.statuses.no);
 
 		await config.updateOne({ enabled: false }).exec();
 		return;
@@ -116,11 +115,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 
 	const duplicate = await Word.findOne({ channel: message.channel.id, word: current }).exec();
 	if (duplicate) {
-		if (
-			!logs
-			&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
-		)
-			await message.react("👎");
+		if (!logs) await tryReact(message, "👎");
 		await reject(
 			`${
 				constants.emojis.statuses.no
@@ -168,6 +163,5 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		id: message.id,
 		word: current,
 	}).save();
-	if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-		await message.react("👍");
+	await tryReact(message, "👍");
 }
