@@ -142,7 +142,7 @@ export async function setLastLetter(
 	await new Word({
 		channel: channelId,
 		author: interaction.user.id,
-		word: letter.toLowerCase(),
+		word: letter,
 		id: (message ?? interaction).id,
 	}).save();
 
@@ -216,8 +216,10 @@ export async function resetChannel(
 		return;
 	}
 
+	await interaction.deferReply();
+
 	await Word.deleteMany({ channel: channelId }).exec();
-	await interaction.reply(
+	await interaction.editReply(
 		`${constants.emojis.statuses.yes} **Fully reset all words used in ${channelMention(channelId)}.**`,
 	);
 }
