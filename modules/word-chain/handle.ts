@@ -6,7 +6,7 @@ import { client, stripMarkdown } from "strife.js";
 import constants from "../../common/constants.ts";
 import { getLogChannel } from "../../common/misc.ts";
 import { assertSendable, tryReact } from "../../util/discord.ts";
-import { normalize } from "../../util/text.ts";
+import { normalize, truncateText } from "../../util/text.ts";
 import { isWord, languages, Word, WordChainConfig } from "./misc.ts";
 
 export default async function handleWordChain(message: Message): Promise<void> {
@@ -76,7 +76,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 				constants.emojis.statuses.no
 			} ${message.author.toString()} **Invalid word!** ${inlineCode(
 				// eslint-disable-next-line unicorn/string-content
-				message.content.replaceAll("`", "'"),
+				truncateText(message.content.replaceAll("`", "'"), 255),
 			)} contains invalid characters.`,
 		);
 		return;
