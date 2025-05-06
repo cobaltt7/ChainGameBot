@@ -1,8 +1,9 @@
 import type { AnyThreadChannel, Message } from "discord.js";
 
-import { PermissionFlagsBits, userMention } from "discord.js";
+import { userMention } from "discord.js";
 import { client, escapeAllMarkdown, stripMarkdown } from "strife.js";
 
+import { tryReact } from "../../util/discord.ts";
 import { Ouija, OuijaBoardConfig } from "./misc.ts";
 
 export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean): Promise<void> {
@@ -66,9 +67,5 @@ export async function handleOujia(message: Message): Promise<void> {
 	ouija.lastUser = message.author.id;
 	await ouija.save();
 
-	if (
-		config?.react
-		&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
-	)
-		await message.react("👍");
+	if (config?.react) await tryReact(message, "👍");
 }

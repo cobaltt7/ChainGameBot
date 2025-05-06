@@ -3,7 +3,9 @@ import type {
 	Awaitable,
 	Channel,
 	Embed,
+	EmojiIdentifierResolvable,
 	Message,
+	MessageReaction,
 	MessageSnapshot,
 	SendableChannels,
 	Snowflake,
@@ -12,10 +14,12 @@ import type {
 import {
 	channelLink,
 	channelMention,
+	DiscordAPIError,
 	hyperlink,
 	messageLink,
 	MessageType,
 	PermissionFlagsBits,
+	RESTJSONErrorCodes,
 	time,
 	TimestampStyles,
 } from "discord.js";
@@ -447,4 +451,24 @@ export function assertSendable<T extends Channel>(channel: T): (T & SendableChan
 
 	if (permissions.has(PermissionFlagsBits.ViewChannel | PermissionFlagsBits.SendMessages))
 		return channel;
+}
+
+export async function tryReact(
+	message: Message,
+	emoji: EmojiIdentifierResolvable,
+): Promise<MessageReaction | undefined> {
+	const { channel } = message;
+	if (channel.isDMBased()) return;
+	const permissions = channel.permissionsFor(client.user);
+	if (!permissions?.has(PermissionFlagsBits.AddReactions)) return;
+	try {
+		return await message.react(emoji);
+	} catch (error) {
+		if (
+			error instanceof DiscordAPIError
+			&& error.code === RESTJSONErrorCodes.ReactionWasBlocked
+		)
+			return;
+		throw error;
+	}
 }

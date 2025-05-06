@@ -1,19 +1,12 @@
 import type { Message } from "discord.js";
 
-import {
-	channelMention,
-	hyperlink,
-	inlineCode,
-	messageLink,
-	PermissionFlagsBits,
-	userMention,
-} from "discord.js";
+import { channelMention, hyperlink, inlineCode, messageLink, userMention } from "discord.js";
 import { client, stripMarkdown } from "strife.js";
 
 import constants from "../../common/constants.ts";
 import { getLogChannel } from "../../common/misc.ts";
-import { assertSendable } from "../../util/discord.ts";
-import { normalize } from "../../util/text.ts";
+import { assertSendable, tryReact } from "../../util/discord.ts";
+import { normalize, truncateText } from "../../util/text.ts";
 import { isWord, languages, Word, WordChainConfig } from "./misc.ts";
 
 export default async function handleWordChain(message: Message): Promise<void> {
@@ -35,8 +28,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 			);
 		} catch {}
 
-		if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-			await message.react(constants.emojis.statuses.no);
+		await tryReact(message, constants.emojis.statuses.no);
 
 		await config.updateOne({ enabled: false }).exec();
 		return;
@@ -63,8 +55,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 					)} server.`,
 				);
 			} catch {}
-		if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-			await message.react(constants.emojis.statuses.no);
+		await tryReact(message, constants.emojis.statuses.no);
 
 		await config.updateOne({ enabled: false }).exec();
 		return;
@@ -85,7 +76,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 				constants.emojis.statuses.no
 			} ${message.author.toString()} **Invalid word!** ${inlineCode(
 				// eslint-disable-next-line unicorn/string-content
-				message.content.replaceAll("`", "'"),
+				truncateText(message.content.replaceAll("`", "'"), 255),
 			)} contains invalid characters.`,
 		);
 		return;
@@ -116,21 +107,17 @@ export default async function handleWordChain(message: Message): Promise<void> {
 
 	const duplicate = await Word.findOne({ channel: message.channel.id, word: current }).exec();
 	if (duplicate) {
-		if (
-			!logs
-			&& message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions)
-		)
-			await message.react("👎");
+		if (!logs) await tryReact(message, "👎");
 		await reject(
 			`${
 				constants.emojis.statuses.no
 			} ${message.author.toString()} **Duplicate word!** ${inlineCode(
 				current,
-			)} has [been used before](${messageLink(
+			)} has [been used before](<${messageLink(
 				message.channel.id,
 				duplicate.id,
 				message.guild.id,
-			)}) by ${userMention(duplicate.author)}.`,
+			)}>) by ${userMention(duplicate.author)}.`,
 		);
 		return;
 	}
@@ -168,6 +155,5 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		id: message.id,
 		word: current,
 	}).save();
-	if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-		await message.react("👍");
+	await tryReact(message, "👍");
 }
