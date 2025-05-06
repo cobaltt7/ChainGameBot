@@ -80,11 +80,11 @@ defineEvent("messageUpdate", async (_, message) => {
 	if (!found && +"0" < 1 /* TODO: only return if there's new messages */) return;
 
 	const response = await sendChat(message);
-	if (found)
+	if (found?.editable)
 		await found.edit(
 			response ?? { content: zeroWidthSpace, components: [], embeds: [], files: [] },
 		);
-	else if (response) {
+	if (!found && response) {
 		if (!assertSendable(message.channel)) return;
 		if (message.system) sentResponses.set(message.id, await message.channel.send(response));
 		else sentResponses.set(message.id, await message.reply(response));
