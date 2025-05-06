@@ -1,18 +1,11 @@
 import type { Message } from "discord.js";
 
-import {
-	channelMention,
-	hyperlink,
-	inlineCode,
-	messageLink,
-	PermissionFlagsBits,
-	userMention,
-} from "discord.js";
+import { channelMention, hyperlink, inlineCode, messageLink, userMention } from "discord.js";
 import { client, stripMarkdown } from "strife.js";
 
 import constants from "../../common/constants.ts";
 import { getLogChannel } from "../../common/misc.ts";
-import { assertSendable } from "../../util/discord.ts";
+import { assertSendable, tryReact } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
 import { isWord, languages, Word, WordChainConfig } from "./misc.ts";
 
@@ -35,8 +28,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 			);
 		} catch {}
 
-		if (message.channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions))
-			await message.react(constants.emojis.statuses.no);
+		await tryReact(message, constants.emojis.statuses.no);
 
 		await config.updateOne({ enabled: false }).exec();
 		return;
@@ -121,11 +113,11 @@ export default async function handleWordChain(message: Message): Promise<void> {
 				constants.emojis.statuses.no
 			} ${message.author.toString()} **Duplicate word!** ${inlineCode(
 				current,
-			)} has [been used before](${messageLink(
+			)} has [been used before](<${messageLink(
 				message.channel.id,
 				duplicate.id,
 				message.guild.id,
-			)}) by ${userMention(duplicate.author)}.`,
+			)}>) by ${userMention(duplicate.author)}.`,
 		);
 		return;
 	}
