@@ -6,9 +6,9 @@ const env =
 	: "development";
 
 export default {
-	collectorTime: 45_000,
-
 	channels: { logs: "897639265696112670" },
+
+	collectorTime: 45_000,
 
 	emojis: {
 		message: {
@@ -21,6 +21,7 @@ export default {
 			fail: "<:emoji:0>",
 			forward: "<:emoji:0>",
 			live: "<:emoji:0>",
+			loading: "<a:emoji:0>",
 			pin: "<:emoji:0>",
 			poll: "<:emoji:0>",
 			raisedHand: "<:emoji:0>",
@@ -33,7 +34,6 @@ export default {
 			success: "<:emoji:0>",
 			thread: "<:emoji:0>",
 			warning: "<:emoji:0>",
-			loading: "<a:emoji:0>",
 		},
 		statuses: { no: "<:emoji:1325338058542813275>", yes: "<:emoji:1325338022207684797>" },
 	} satisfies Record<string, Record<string, `<${"a" | ""}:emoji:${Snowflake}>`>>,
