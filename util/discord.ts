@@ -56,10 +56,7 @@ export function messageToText(
 			)} is thinking...`);
 	const snapshots = message.messageSnapshots
 		?.map((snapshot) => {
-			const text = messageToText(snapshot, false)
-				.split("\n")
-				.map((line) => (line.startsWith("> ") ? line : `> ${line}`))
-				.join("\n");
+			const text = messageToText(snapshot, false).replaceAll(/^(?:> |>>> )?/gm, "> ");
 			return `> *${constants.emojis.message.forward} Forwarded${text ? `\n${text}` : ""}`;
 		})
 		.join("\n\n");
@@ -67,7 +64,7 @@ export function messageToText(
 	const content =
 		loadingMessage
 		|| (snapshots && message.content ?
-			`${snapshots}\n\n${message.content}`
+			`${message.content}\n\n${snapshots}`
 		:	snapshots || message.content);
 
 	if (message.partial) return content;
