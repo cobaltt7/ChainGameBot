@@ -74,7 +74,7 @@ defineEvent("messageCreate", async (message) => {
 });
 
 defineEvent("messageUpdate", async (_, message) => {
-	if (message.partial || !message.inGuild()) return;
+	if (!message.inGuild()) return;
 
 	const found = sentResponses.get(message.id);
 	if (!found && +"0" < 1 /* TODO: only return if there's new messages */) return;

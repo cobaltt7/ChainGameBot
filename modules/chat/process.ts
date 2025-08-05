@@ -14,7 +14,6 @@ import {
 	ChannelType,
 	Collection,
 	FormattingPatterns,
-	GuildNavigationMentions,
 	GuildTemplate,
 	messageLink,
 	MessageMentions,
@@ -61,7 +60,7 @@ function anonymizeMentions(string: string, author: GuildMember | User): string {
 		.replaceAll(GlobalUsersPattern, clientUser)
 		.replaceAll(GlobalChannelsPattern, defaultChannel)
 		.replaceAll(GlobalRolesPattern, defaultRole)
-		.replaceAll(GlobalLinkedRolePattern, GuildNavigationMentions.LinkedRoles)
+		.replaceAll(GlobalLinkedRolePattern, "<id:linked-roles>")
 		.replaceAll(
 			/https?:\/\/\w+\.discord(?:app)?\.com\/channels\/(?<guild>\d{17,20}|@me)\/(?<channel>\d{17,20})\/(?<message>\d{17,20})/gi,
 			messageLink("0", "0", "guild" in author ? author.guild.id : "@me"),

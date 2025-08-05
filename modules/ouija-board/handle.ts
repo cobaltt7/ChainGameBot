@@ -7,7 +7,7 @@ import { tryReact } from "../../util/discord.ts";
 import { Ouija, OuijaBoardConfig } from "./misc.ts";
 
 export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean): Promise<void> {
-	if (!newlyCreated || !thread.parent || !thread.ownerId) return;
+	if (!newlyCreated || !thread.parent ) return;
 
 	const config = await OuijaBoardConfig.findOne({ channel: thread.parent.id }).exec();
 	if (!config?.enabled) return;
