@@ -15,6 +15,7 @@ import {
 	channelMention,
 	ComponentType,
 	hyperlink,
+	MessageFlags,
 	messageLink,
 	TextInputStyle,
 	userMention,
@@ -160,7 +161,7 @@ export async function resetChannelConfirm(
 	const [channelId, userId] = data.split(",");
 	if (interaction.user.id !== userId) return;
 	await interaction.reply({
-		ephemeral: true,
+		flags: MessageFlags.Ephemeral,
 		content:
 			`**Are you sure** you want to **reset all words** used in ${channelMention(channelId)}? **This is irreversible.** All words ever used in this channel will be **permamently wiped from the database.**\n`
 			+ "Alternatively, you can create and configure a new channel for Word Chain, and the words used here will not transfer over.",
@@ -210,7 +211,7 @@ export async function resetChannel(
 ): Promise<void> {
 	if (interaction.fields.getTextInputValue("confirmation") !== "confirm") {
 		await interaction.reply({
-			ephemeral: true,
+			flags: MessageFlags.Ephemeral,
 			content: `${constants.emojis.statuses.no} Channel reset canceled.`,
 		});
 		return;

@@ -6,7 +6,7 @@ import type {
 	User,
 } from "discord.js";
 
-import { ButtonStyle, channelLink, ComponentType, hideLinkEmbed, hyperlink } from "discord.js";
+import { ButtonStyle, channelLink, ComponentType, hideLinkEmbed, hyperlink, MessageFlags } from "discord.js";
 import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
@@ -61,7 +61,7 @@ export async function showConsent(interaction: ChatInputCommandInteraction): Pro
 				)
 			}`,
 		components: createButtons(interaction.inGuild()),
-		ephemeral: true,
+		 flags: MessageFlags.Ephemeral
 	});
 }
 export async function allowChat(interaction: ButtonInteraction): Promise<void> {
@@ -77,7 +77,7 @@ export async function allowChat(interaction: ButtonInteraction): Promise<void> {
 	await consent.save();
 
 	await interaction.reply({
-		ephemeral: true,
+		 flags: MessageFlags.Ephemeral,
 		content: `${
 			constants.emojis.statuses.yes
 		} Updated settings!\n${await getSettings(interaction.user)}`,
@@ -97,7 +97,7 @@ export async function denyChat(interaction: ButtonInteraction): Promise<void> {
 	await consent.save();
 
 	await interaction.reply({
-		ephemeral: true,
+		 flags: MessageFlags.Ephemeral,
 		content: `${
 			constants.emojis.statuses.yes
 		} Updated settings!\n${await getSettings(interaction.user)}`,

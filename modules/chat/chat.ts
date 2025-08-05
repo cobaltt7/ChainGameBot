@@ -11,6 +11,7 @@ import didYouMean, { ReturnTypeEnums, ThresholdTypeEnums } from "didyoumean2";
 import {
 	ChannelType,
 	ComponentType,
+	MessageFlags,
 	MessageType,
 	PermissionFlagsBits,
 	TextInputStyle,
@@ -124,7 +125,7 @@ export async function removeResponse(
 		.catch(() => void 0);
 
 	if (!modalInteraction) return;
-	await modalInteraction.deferReply({ ephemeral: true });
+	await modalInteraction.deferReply({ flags: MessageFlags.Ephemeral });
 
 	const response = interaction.targetMessage.content
 		.replaceAll(client.user.toString(), "<@0>")

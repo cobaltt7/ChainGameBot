@@ -14,6 +14,7 @@ import {
 	ComponentType,
 	hyperlink,
 	inlineCode,
+	MessageFlags,
 	messageLink,
 	TextInputStyle,
 	userMention,
@@ -117,7 +118,7 @@ export async function setLastNumber(
 	const config = await Counting.findOne({ channel: channelId }).exec();
 	if (!config) {
 		await interaction.reply({
-			ephemeral: true,
+			 flags: MessageFlags.Ephemeral,
 			content: `${
 				constants.emojis.statuses.no
 			} Could not find a Counting configuration for ${channelMention(channelId)}!`,
@@ -129,7 +130,7 @@ export async function setLastNumber(
 	const number = parseNumber(rawNumber, config.base);
 	if (Number.isNaN(number)) {
 		await interaction.reply({
-			ephemeral: true,
+			 flags: MessageFlags.Ephemeral,
 			content: `${constants.emojis.statuses.no} **Invalid number!** ${inlineCode(
 				// eslint-disable-next-line unicorn/string-content
 				rawNumber.replaceAll("`", "'"),
