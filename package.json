@@ -20,7 +20,7 @@
 		"discord.js": "14.18.0",
 		"match-sorter": "8.1.0",
 		"mongoose": "8.16.5",
-		"strife.js": "4.3.2"
+		"strife.js": "4.4.0"
 	},
 	"devDependencies": {
 		"@redguy12/prettier-config": "3.4.3",

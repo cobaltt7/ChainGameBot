@@ -13,41 +13,25 @@ import {
 	channelMention,
 	ChannelType,
 	Collection,
-	FormattingPatterns,
-	GuildTemplate,
 	messageLink,
-	MessageMentions,
 	PermissionFlagsBits,
 	roleMention,
 	SnowflakeUtil,
 	userMention,
 } from "discord.js";
-import { client, GlobalUsersPattern, InvitesPattern } from "strife.js";
+import {
+	client,
+	GlobalChannelsPattern,
+	GlobalEmojiPattern,
+	GlobalGuildTemplatesPattern,
+	GlobalInvitesPattern,
+	GlobalLinkedRolePattern,
+	GlobalRolesPattern,
+	GlobalUsersPattern,
+} from "strife.js";
 
 import { GlobalBotInvitesPattern, messageToText } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
-
-// TODO: Import from Strife after v4.4
-const GlobalGuildTemplatesPattern = new RegExp(
-	GuildTemplate.GuildTemplatesPattern,
-	`g${GuildTemplate.GuildTemplatesPattern.flags}`,
-);
-const GlobalRolesPattern = new RegExp(
-	MessageMentions.RolesPattern,
-	`g${MessageMentions.RolesPattern.flags}`,
-);
-const GlobalChannelsPattern = new RegExp(
-	MessageMentions.ChannelsPattern,
-	`g${MessageMentions.ChannelsPattern.flags}`,
-);
-const GlobalEmojiPattern = new RegExp(
-	FormattingPatterns.Emoji,
-	`g${FormattingPatterns.Emoji.flags}`,
-);
-const GlobalLinkedRolePattern = new RegExp(
-	FormattingPatterns.LinkedRole,
-	`g${FormattingPatterns.LinkedRole.flags}`,
-);
 
 const defaultUser = userMention("0");
 const defaultChannel = channelMention("0");
@@ -118,7 +102,7 @@ export function preProcessResponse(message: Message): string | undefined {
 		response === ""
 		|| response.length > 500
 		|| response.split("\n").length > 5
-		|| response.match(InvitesPattern)?.length
+		|| response.match(GlobalInvitesPattern)?.length
 		|| response.match(GlobalGuildTemplatesPattern)?.length
 		|| response.match(GlobalBotInvitesPattern)?.length
 	)
