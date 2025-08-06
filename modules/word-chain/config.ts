@@ -49,43 +49,66 @@ export default async function configWordChain(
 
 	const latest = await Word.findOne({ channel: config.channel }).sort({ createdAt: -1 }).exec();
 	await interaction.reply({
-		embeds: [
-			{
-				title: "Word Chain Settings",
-				color: constants.themeColor,
-				description:
-					`**Channel**: ${channelMention(config.channel)}\n`
-					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
-					+ `**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
-					+ `**Phrases**: ${constants.emojis.statuses[config.phrases ? "yes" : "no"]}\n`
-					+ `**Language**: ${
-						formatLanguageName(config.language)
-						|| `${constants.emojis.statuses.no} *Unknown language!*`
-					}${
-						latest ?
-							`\n\n*Last Word: ${hyperlink(
-								latest.word,
-								messageLink(config.channel, latest.id, interaction.guild.id),
-							)} by ${userMention(latest.author)}*`
-						:	""
-					}`,
-			},
-		],
+		flags: MessageFlags.IsComponentsV2,
+
 		components: [
 			{
-				type: ComponentType.ActionRow,
+				type: ComponentType.Container,
+				accentColor: constants.themeColor,
 				components: [
+					{ type: ComponentType.TextDisplay, content: "## Word Chain Settings" },
 					{
-						type: ComponentType.Button,
-						customId: `${config.channel},${interaction.user.id}_setLastLetter`,
-						label: "Set Last Letter",
-						style: ButtonStyle.Secondary,
+						type: ComponentType.TextDisplay,
+						content:
+							`**Channel**: ${channelMention(config.channel)}\n`
+							+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}`,
 					},
 					{
-						type: ComponentType.Button,
-						customId: `${config.channel},${interaction.user.id}_resetChannel`,
-						label: "Reset Channel",
-						style: ButtonStyle.Danger,
+						type: ComponentType.TextDisplay,
+						content:
+							`**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
+							+ `**Phrases**: ${constants.emojis.statuses[config.phrases ? "yes" : "no"]}\n`
+							+ `**Language**: ${
+								formatLanguageName(config.language)
+								|| `${constants.emojis.statuses.no} *Unknown language!*`
+							}`,
+					},
+					{
+						type: ComponentType.Section,
+						components: [
+							{
+								type: ComponentType.TextDisplay,
+								content:
+									latest ?
+										`*Last Word: ${hyperlink(
+											latest.word,
+											messageLink(
+												config.channel,
+												latest.id,
+												interaction.guild.id,
+											),
+										)} by ${userMention(latest.author)}*`
+									:	"*No words yet*",
+							},
+						],
+						accessory: {
+							type: ComponentType.Button,
+							customId: `${config.channel},${interaction.user.id}_setLastLetter`,
+							label: "Set Last Letter",
+							style: ButtonStyle.Secondary,
+						},
+					},
+
+					{
+						type: ComponentType.ActionRow,
+						components: [
+							{
+								type: ComponentType.Button,
+								customId: `${config.channel},${interaction.user.id}_resetChannel`,
+								label: "Reset Channel",
+								style: ButtonStyle.Danger,
+							},
+						],
 					},
 				],
 			},

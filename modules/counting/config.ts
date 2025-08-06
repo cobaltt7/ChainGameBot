@@ -48,36 +48,54 @@ export default async function configCounting(
 	const lastLink =
 		config.lastId && messageLink(config.channel, config.lastId, interaction.guild.id);
 	await interaction.reply({
-		embeds: [
-			{
-				title: "Counting Settings",
-				color: constants.themeColor,
-				description:
-					`**Channel**: ${channelMention(config.channel)}\n`
-					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
-					+ `**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
-					+ `**Base**: ${config.base.toLocaleString()}\n`
-					+ `**Step**: ${config.step.toLocaleString()}\n`
-					+ `**Reset on Invalid**: ${
-						constants.emojis.statuses[config.reset ? "yes" : "no"]
-					}\n\n`
-					+ `*Last Number: ${
-						(lastLink ?
-							hyperlink(stringifyNumber(config.lastNumber, config.base), lastLink)
-						:	stringifyNumber(config.lastNumber, config.base))
-						+ (config.lastAuthor ? ` by ${userMention(config.lastAuthor)}` : "")
-					}*`,
-			},
-		],
+		flags: MessageFlags.IsComponentsV2,
+
 		components: [
 			{
-				type: ComponentType.ActionRow,
+				type: ComponentType.Container,
+				accentColor: constants.themeColor,
 				components: [
+					{ type: ComponentType.TextDisplay, content: "## Counting Settings" },
 					{
-						type: ComponentType.Button,
-						customId: `${config.channel},${interaction.user.id}_setLastNumber`,
-						label: "Set Last Number",
-						style: ButtonStyle.Secondary,
+						type: ComponentType.TextDisplay,
+						content:
+							`**Channel**: ${channelMention(config.channel)}\n`
+							+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}`,
+					},
+					{
+						type: ComponentType.TextDisplay,
+						content:
+							`**Logs Channel**: ${await displayLogChannel(config, interaction.guild)}\n`
+							+ `**Base**: ${config.base.toLocaleString()}\n`
+							+ `**Step**: ${config.step.toLocaleString()}\n`
+							+ `**Reset on Invalid**: ${
+								constants.emojis.statuses[config.reset ? "yes" : "no"]
+							}`,
+					},
+					{
+						type: ComponentType.Section,
+						components: [
+							{
+								type: ComponentType.TextDisplay,
+								content: `*Last Number: ${
+									(lastLink ?
+										hyperlink(
+											stringifyNumber(config.lastNumber, config.base),
+											lastLink,
+										)
+									:	stringifyNumber(config.lastNumber, config.base))
+									+ (config.lastAuthor ?
+										` by ${userMention(config.lastAuthor)}`
+									:	"")
+								}*`,
+							},
+						],
+						accessory: {
+							type: ComponentType.Button,
+							customId: `${config.channel},${interaction.user.id}_setLastNumber`,
+							label: "Set Last Number",
+							style: ButtonStyle.Secondary,
+						},
 					},
 				],
 			},

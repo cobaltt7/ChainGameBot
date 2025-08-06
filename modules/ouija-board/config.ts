@@ -2,7 +2,7 @@ import type { ChatInputCommandInteraction, ForumChannel, MediaChannel } from "di
 
 import assert from "node:assert";
 
-import { channelMention, inlineCode } from "discord.js";
+import { channelMention, ComponentType, inlineCode, MessageFlags } from "discord.js";
 
 import constants from "../../common/constants.ts";
 import { OuijaBoardConfig } from "./misc.ts";
@@ -30,15 +30,27 @@ export default async function configOuijaBoard(
 	).exec();
 
 	await interaction.reply({
-		embeds: [
+		flags: MessageFlags.IsComponentsV2,
+
+		components: [
 			{
-				title: "Ouija Board Settings",
-				color: constants.themeColor,
-				description:
-					`**Channel**: ${channelMention(config.channel)}\n`
-					+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n\n`
-					+ `**React**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n`
-					+ `**Completion Message**: ${inlineCode(config.complete)}`,
+				type: ComponentType.Container,
+				accentColor: constants.themeColor,
+				components: [
+					{ type: ComponentType.TextDisplay, content: "## Ouija Board Settings" },
+					{
+						type: ComponentType.TextDisplay,
+						content:
+							`**Channel**: ${channelMention(config.channel)}\n`
+							+ `**Enabled**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}`,
+					},
+					{
+						type: ComponentType.TextDisplay,
+						content:
+							`**React**: ${constants.emojis.statuses[config.enabled ? "yes" : "no"]}\n`
+							+ `**Completion Message**: ${inlineCode(config.complete)}`,
+					},
+				],
 			},
 		],
 	});
