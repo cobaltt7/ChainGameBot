@@ -14,7 +14,7 @@ import {
 import { assertSendable } from "../../util/discord.ts";
 import sendChat, { learn, removeResponse } from "./chat.ts";
 import configChat from "./config.ts";
-import { allowChat, denyChat, showConsent } from "./consent.ts";
+import { chatConsent, showConsent } from "./consent.ts";
 
 defineChatCommand(
 	{
@@ -50,8 +50,7 @@ defineChatCommand(
 	{ name: "allow-cgb-chat", description: "Allow CGB to save your messages for use in CGB Chat" },
 	showConsent,
 );
-defineButton("allowChat", allowChat);
-defineButton("denyChat", denyChat);
+defineButton("chatConsent", chatConsent);
 
 const ignoredChannels = new Set<Snowflake>();
 const sentResponses = new Map<Snowflake, Message>();

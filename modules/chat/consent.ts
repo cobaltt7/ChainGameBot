@@ -40,13 +40,13 @@ function createButtons(inGuild: boolean): ActionRowData<InteractionButtonCompone
 			type: ComponentType.ActionRow,
 			components: [
 				{
-					customId: "_allowChat",
+					customId: "allow_chatConsent",
 					type: ComponentType.Button,
 					label: `Store my messages in ${inGuild ? "this server" : "all servers"}`,
 					style: ButtonStyle.Success,
 				},
 				{
-					customId: "_denyChat",
+					customId: "deny_chatConsent",
 					type: ComponentType.Button,
 					label: `Don’t store my messages in ${inGuild ? "this server" : "all servers"}`,
 					style: ButtonStyle.Danger,
@@ -71,35 +71,15 @@ export async function showConsent(interaction: ChatInputCommandInteraction): Pro
 		flags: MessageFlags.Ephemeral,
 	});
 }
-export async function allowChat(interaction: ButtonInteraction): Promise<void> {
+export async function chatConsent(interaction: ButtonInteraction, type: string): Promise<void> {
 	const consent = await ChatConsent.findOneAndUpdate(
 		{ user: interaction.user.id },
 		{},
 		{ new: true, upsert: true, setDefaultsOnInsert: true },
 	).exec();
 
-	if (interaction.inGuild()) consent.guilds.set(interaction.guildId, true);
-	else consent.default = true;
-
-	await consent.save();
-
-	await interaction.reply({
-		flags: MessageFlags.Ephemeral,
-		content: `${
-			constants.emojis.statuses.yes
-		} Updated settings!\n${await getSettings(interaction.user)}`,
-		components: createButtons(interaction.inGuild()),
-	});
-}
-export async function denyChat(interaction: ButtonInteraction): Promise<void> {
-	const consent = await ChatConsent.findOneAndUpdate(
-		{ user: interaction.user.id },
-		{},
-		{ new: true, upsert: true, setDefaultsOnInsert: true },
-	).exec();
-
-	if (interaction.inGuild()) consent.guilds.set(interaction.guildId, false);
-	else consent.default = false;
+	if (interaction.inGuild()) consent.guilds.set(interaction.guildId, type === "allow");
+	else consent.default = type === "allow";
 
 	await consent.save();
 
