@@ -135,7 +135,7 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		return;
 	}
 
-	const letter = latest && latest.word.at(-1);
+	const letter = latest && latest.word.at(-1)?.toLowerCase();
 	if (letter && letter !== current[0]) {
 		await reject(
 			`${
