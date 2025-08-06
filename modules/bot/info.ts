@@ -24,7 +24,7 @@ export default async function info(interaction: ChatInputCommandInteraction): Pr
 				title: "Status",
 				thumbnail: { url: client.user.displayAvatarURL() },
 				color: constants.themeColor,
-				description: `I’m open-source! The source code is available [on GitHub](https://github.com/cobaltt7/ChainGameBot).`,
+				description: "I’m open-source! The source code is available [on GitHub](https://github.com/cobaltt7/ChainGameBot).",
 
 				fields: [
 					{ name: "⚙️ Mode", value: inlineCode(constants.env), inline: true },

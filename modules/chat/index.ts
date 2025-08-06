@@ -19,12 +19,13 @@ import { chatConsent, showConsent } from "./consent.ts";
 defineChatCommand(
 	{
 		name: "cgb-chat",
-		description: `View or edit the server’s CGB Chat settings`,
+		description: "View or edit the server’s CGB Chat settings",
 		access: false,
 		restricted: true,
 		options: {
 			channel: {
-				description: `The channel to use for CGB Chat, or omit to only track messages and not respond`,
+				description:
+					"The channel to use for CGB Chat, or omit to only track messages and not respond",
 				type: ApplicationCommandOptionType.Channel,
 				channelTypes: [
 					ChannelType.AnnouncementThread,
@@ -38,7 +39,7 @@ defineChatCommand(
 				required: false,
 			},
 			enabled: {
-				description: `Enable tracking messages in this server`,
+				description: "Enable tracking messages in this server",
 				type: ApplicationCommandOptionType.Boolean,
 				required: true,
 			},
@@ -101,7 +102,7 @@ defineEvent("messageDelete", async (message) => {
 
 defineMenuCommand(
 	{
-		name: `Remove CGB Chat Response`,
+		name: "Remove CGB Chat Response",
 		type: ApplicationCommandType.Message,
 		restricted: true,
 		access: false,

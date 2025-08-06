@@ -47,7 +47,9 @@ export async function handleOujia(message: Message): Promise<void> {
 			await message.channel.send(
 				`## ${userMention(ouija.owner)} wants to know: __${escapeAllMarkdown(
 					message.channel.name,
-				)}__\n**The spirits have responded!**\n> ${ouija.answer}`,
+				)}__\n`
+					+ "**The spirits have responded!**\n"
+					+ `> ${ouija.answer}`,
 			);
 		return;
 	}

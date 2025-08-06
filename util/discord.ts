@@ -253,7 +253,7 @@ export function messageToText(
 					const replyContent =
 						cleanContent && `\n> ${truncateText(stripMarkdown(cleanContent), 300)}`;
 					return `*[Replying to ](${replyLink})${reply.author.toString()}${
-						replyContent && `:`
+						replyContent && ":"
 					}*${replyContent}\n\n${content}`;
 				});
 		}
@@ -287,7 +287,10 @@ export function messageToText(
 				);
 		}
 		case MessageType.GuildInviteReminder: {
-			return "Wondering who to invite?\nStart by inviting anyone who can help you build the server!";
+			return (
+				"Wondering who to invite?\n"
+				+ "Start by inviting anyone who can help you build the server!"
+			);
 		}
 		case MessageType.ContextMenuCommand: {
 			if (!references || !message.interaction) break;
@@ -354,7 +357,7 @@ export function messageToText(
 			return `${
 				constants.emojis.message.subscription
 			} ${message.author.toString()} upgraded ${
-				message.groupActivityApplication?.name ?? `a deleted application`
+				message.groupActivityApplication?.name ?? "a deleted application"
 			} to premium for this server! 🎉`;
 		}
 		case MessageType.GuildIncidentAlertModeEnabled: {
