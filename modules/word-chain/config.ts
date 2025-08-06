@@ -197,13 +197,13 @@ export async function resetChannelModal(
 						customId: "confirmation",
 						label: "This is your last chance to change your mind.",
 						style: TextInputStyle.Short,
-						required: true,
 						placeholder: "Please type “confirm” to confirm the channel reset",
 					},
 				],
 			},
 		],
 	});
+	if (interaction.message.deletable) await interaction.message.delete();
 }
 export async function resetChannel(
 	interaction: ModalSubmitInteraction,
