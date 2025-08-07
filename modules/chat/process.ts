@@ -134,7 +134,7 @@ async function replaceChannels(response: string, guild: Guild): Promise<string> 
 	const threads = (await guild.channels.fetchActiveThreads()).threads.filter(
 		(channel): channel is Exclude<typeof channel, PrivateThreadChannel> =>
 			channel.type !== ChannelType.PrivateThread
-			&& !!channel
+			&& channel
 				.permissionsFor(guild.roles.everyone)
 				.has(PermissionFlagsBits.ViewChannel | PermissionFlagsBits.ReadMessageHistory),
 	);
