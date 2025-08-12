@@ -1,11 +1,12 @@
 import type { AnyThreadChannel, Message, PartialMessage } from "discord.js";
 
 import { userMention } from "discord.js";
-import { client, escapeAllMarkdown, stripMarkdown } from "strife.js";
+import { client, escapeAllMarkdown } from "strife.js";
 
+import constants from "../../common/constants.ts";
 import { tryReact } from "../../util/discord.ts";
-import { normalize } from "../../util/text.ts";
 import { Ouija, OuijaBoardConfig } from "./misc.ts";
+import processWord, { resendDeleted } from "./process.ts";
 
 export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean): Promise<void> {
 	if (!newlyCreated || !thread.parent) return;
@@ -15,8 +16,6 @@ export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean)
 
 	await new Ouija({ channel: thread.id, owner: thread.ownerId }).save();
 }
-
-const BLANKS = new Set(["blank", "space", "tab", "enter"]);
 
 export async function handleOujia(message: Message): Promise<void> {
 	if (message.system || !message.channel.isThread() || !message.channel.parent) return;
@@ -37,17 +36,21 @@ export async function handleOujia(message: Message): Promise<void> {
 	}
 
 	const config = await OuijaBoardConfig.findOne({ channel: message.channel.parent.id }).exec();
+
+	const character = processWord(message.cleanContent, config?.complete);
+
 	const last = ouija.answer.at(-1);
-	const isEndOfWord = last && !last.endsWith(" ");
+	if (
+		character === false
+		|| ((character === " " || character === true) && (!last || last.endsWith(" ")))
+	) {
+		if (message.deletable) await message.delete().catch(() => void 0);
+		return;
+	}
 
-	const character = stripMarkdown(message.cleanContent);
-	const content = normalize(character);
-	if (content === config?.complete) {
-		if (!isEndOfWord) {
-			if (message.deletable) await message.delete().catch(() => void 0);
-			return;
-		}
+	if (config?.react) await tryReact(message, "👍");
 
+	if (character === true) {
 		await ouija.deleteOne();
 		if (message.channel.sendable)
 			await message.channel.send(
@@ -55,26 +58,42 @@ export async function handleOujia(message: Message): Promise<void> {
 					message.channel.name,
 				)}__\n`
 					+ "**The spirits have responded!**\n"
-					+ `> ${ouija.answer}`,
+					+ `> ${[ouija.answer].flat().join("")}`,
 			);
 		return;
 	}
 
-	if (BLANKS.has(content) || /^\s+$/.test(character))
-		if (isEndOfWord) ouija.answer += " ";
-		else {
-		if (message.deletable) await message.delete().catch(() => void 0);
-		return;
-	}
-else 	if ([...new Intl.Segmenter().segment(character)].length === 1)
-ouija.answer += message.cleanContent;
-	else {
-		if (message.deletable) await message.delete().catch(() => void 0);
-		return;
-	}
+	if (typeof ouija.answer === "string") ouija.answer += character;
+	else ouija.answer.push(character);
+	ouija.markModified("answer");
 
-		ouija.lastUser = message.author.id;
+	ouija.lastUser = message.author.id;
+	ouija.lastMessage = message.id;
+
 	await ouija.save();
+}
 
-	if (config?.react) await tryReact(message, "👍");
+export async function handleEdit(_: Message | PartialMessage, message: Message): Promise<void> {
+	const ouija = await Ouija.findOne({
+		channel: message.channel.id,
+		lastMessage: message.id,
+	}).exec();
+	if (!ouija || typeof ouija.answer === "string") return;
+
+	const last = ouija.answer.at(-1);
+	if (!last || processWord(message.cleanContent) === last) return;
+
+	await resendDeleted(ouija, message.channel);
+
+	const deleted = message.deletable && (await message.delete().catch(() => void 0));
+	if (!deleted) await tryReact(message, constants.emojis.statuses.no);
+}
+export async function handleDelete(message: Message | PartialMessage): Promise<void> {
+	const ouija = await Ouija.findOne({
+		channel: message.channel.id,
+		lastMessage: message.id,
+	}).exec();
+	if (!ouija || typeof ouija.answer === "string") return;
+
+	await resendDeleted(ouija, message.channel);
 }

@@ -1,3 +1,5 @@
+import type { Snowflake } from "discord.js";
+
 import { model, Schema } from "mongoose";
 
 export const OuijaBoardConfig = model(
@@ -12,10 +14,17 @@ export const OuijaBoardConfig = model(
 
 export const Ouija = model(
 	"Ouija",
-	new Schema({
+	new Schema<{
+		channel: string;
+		answer: string | string[];
+		owner: Snowflake;
+		lastUser?: Snowflake;
+		lastMessage?: Snowflake;
+	}>({
 		channel: { type: String, required: true },
-		answer: { type: String, default: "" },
+		answer: { type: Schema.Types.Mixed, default: [] },
 		owner: { type: String, required: true },
 		lastUser: String,
+		lastMessage: String,
 	}),
 );

@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ChannelType } from "discord.js";
 import { defineChatCommand, defineEvent } from "strife.js";
 
 import configOuijaBoard from "./config.ts";
-import { handleOujia, initOuija } from "./handle.ts";
+import { handleDelete, handleEdit, handleOujia, initOuija } from "./handle.ts";
 
 defineChatCommand(
 	{
@@ -40,3 +40,5 @@ defineChatCommand(
 
 defineEvent("threadCreate", initOuija);
 defineEvent("messageCreate", handleOujia);
+defineEvent("messageUpdate", handleEdit);
+defineEvent("messageDelete", handleDelete);
