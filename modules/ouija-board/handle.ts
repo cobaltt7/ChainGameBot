@@ -1,9 +1,10 @@
-import type { AnyThreadChannel, Message } from "discord.js";
+import type { AnyThreadChannel, Message, PartialMessage } from "discord.js";
 
 import { userMention } from "discord.js";
 import { client, escapeAllMarkdown, stripMarkdown } from "strife.js";
 
 import { tryReact } from "../../util/discord.ts";
+import { normalize } from "../../util/text.ts";
 import { Ouija, OuijaBoardConfig } from "./misc.ts";
 
 export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean): Promise<void> {
@@ -15,7 +16,7 @@ export async function initOuija(thread: AnyThreadChannel, newlyCreated: boolean)
 	await new Ouija({ channel: thread.id, owner: thread.ownerId }).save();
 }
 
-const BLANKS = new Set(["blank", "space", "tab"]);
+const BLANKS = new Set(["blank", "space", "tab", "enter"]);
 
 export async function handleOujia(message: Message): Promise<void> {
 	if (message.system || !message.channel.isThread() || !message.channel.parent) return;
@@ -36,8 +37,13 @@ export async function handleOujia(message: Message): Promise<void> {
 	}
 
 	const config = await OuijaBoardConfig.findOne({ channel: message.channel.parent.id }).exec();
-	if (message.content === config?.complete) {
-		if (ouija.answer === "" || ouija.answer.endsWith(" ")) {
+	const last = ouija.answer.at(-1);
+	const isEndOfWord = last && !last.endsWith(" ");
+
+	const character = stripMarkdown(message.cleanContent);
+	const content = normalize(character);
+	if (content === config?.complete) {
+		if (!isEndOfWord) {
 			if (message.deletable) await message.delete().catch(() => void 0);
 			return;
 		}
@@ -54,19 +60,20 @@ export async function handleOujia(message: Message): Promise<void> {
 		return;
 	}
 
-	const character = BLANKS.has(message.content) ? " " : stripMarkdown(message.cleanContent);
-	if ([...new Intl.Segmenter().segment(character)].length !== 1) {
+	if (BLANKS.has(content) || /^\s+$/.test(character))
+		if (isEndOfWord) ouija.answer += " ";
+		else {
+		if (message.deletable) await message.delete().catch(() => void 0);
+		return;
+	}
+else 	if ([...new Intl.Segmenter().segment(character)].length === 1)
+ouija.answer += message.cleanContent;
+	else {
 		if (message.deletable) await message.delete().catch(() => void 0);
 		return;
 	}
 
-	if (character === " " && (ouija.answer === "" || ouija.answer.endsWith(" "))) {
-		if (message.deletable) await message.delete().catch(() => void 0);
-		return;
-	}
-
-	ouija.answer += character === " " ? character : message.cleanContent;
-	ouija.lastUser = message.author.id;
+		ouija.lastUser = message.author.id;
 	await ouija.save();
 
 	if (config?.react) await tryReact(message, "👍");
