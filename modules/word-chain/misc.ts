@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
 import { normalize } from "../../util/text.ts";
 
-export const WordChainConfig = mongoose.model(
+export const WordChainConfig = model(
 	"WordChainConfig",
-	new mongoose.Schema({
+	new Schema({
 		channel: { type: String, required: true },
 		enabled: { type: Boolean, default: true },
 		language: { type: String, default: "en" },
@@ -13,9 +13,9 @@ export const WordChainConfig = mongoose.model(
 		silent: { type: Boolean, default: false },
 	}),
 );
-export const Word = mongoose.model(
+export const Word = model(
 	"Word",
-	new mongoose.Schema(
+	new Schema(
 		{
 			channel: { type: String, required: true },
 			author: { type: String, required: true },

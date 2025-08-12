@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
-export const OuijaBoardConfig = mongoose.model(
+export const OuijaBoardConfig = model(
 	"OuijaBoardConfig",
-	new mongoose.Schema({
+	new Schema({
 		channel: { type: String, required: true },
 		enabled: { type: Boolean, default: true },
 		react: { type: Boolean, default: true },
@@ -10,9 +10,9 @@ export const OuijaBoardConfig = mongoose.model(
 	}),
 );
 
-export const Ouija = mongoose.model(
+export const Ouija = model(
 	"Ouija",
-	new mongoose.Schema({
+	new Schema({
 		channel: { type: String, required: true },
 		answer: { type: String, default: "" },
 		owner: { type: String, required: true },

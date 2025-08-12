@@ -1,25 +1,25 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
-export const ChatConfig = mongoose.model(
+export const ChatConfig = model(
 	"ChatConfig",
-	new mongoose.Schema({
+	new Schema({
 		guild: { type: String, required: true },
 		channel: String,
 		enabled: { type: Boolean, default: false },
 	}),
 );
 
-export const Chat = mongoose.model(
+export const Chat = model(
 	"Chat",
-	new mongoose.Schema({
+	new Schema({
 		guild: { type: String, required: true },
 		prompt: String,
 		response: { type: String, required: true },
 	}),
 );
-export const ChatConsent = mongoose.model(
+export const ChatConsent = model(
 	"ChatConsent",
-	new mongoose.Schema({
+	new Schema({
 		user: { type: String, required: true },
 		default: { type: Boolean, default: false },
 		guilds: { type: Map, of: Boolean, default: {} },

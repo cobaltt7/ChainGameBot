@@ -1,9 +1,9 @@
 import { inlineCode } from "discord.js";
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
-export const Counting = mongoose.model(
+export const Counting = model(
 	"Counting",
-	new mongoose.Schema({
+	new Schema({
 		base: { type: Number, default: 10 },
 		channel: { type: String, required: true },
 		enabled: { type: Boolean, default: true },
