@@ -17,7 +17,7 @@
 	"prettier": "@redguy12/prettier-config",
 	"dependencies": {
 		"didyoumean2": "7.0.4",
-		"discord.js": "14.21.0",
+		"discord.js": "14.22.1",
 		"match-sorter": "8.1.0",
 		"mongoose": "8.17.2",
 		"strife.js": "4.4.0"
