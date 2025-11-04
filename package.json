@@ -19,7 +19,7 @@
 		"didyoumean2": "7.0.4",
 		"discord.js": "14.22.1",
 		"match-sorter": "8.1.0",
-		"mongoose": "8.19.1",
+		"mongoose": "8.19.3",
 		"strife.js": "4.4.0"
 	},
 	"devDependencies": {
