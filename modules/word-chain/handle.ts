@@ -93,14 +93,30 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		return;
 	}
 
-	const current = normalize(word);
-	if (!(await isWord(current, language))) {
+	const latest = await Word.findOne({ channel: message.channel.id })
+		.sort({ createdAt: -1 })
+		.exec();
+
+	if (latest?.author === message.author.id) {
 		await reject(
 			`${
 				constants.emojis.statuses.no
-			} ${message.author.toString()} **Unknown word!** ${inlineCode(
+			} ${message.author.toString()} **You can’t send two words in a row!**`,
+		);
+		return;
+	}
+
+	const letter = latest && latest.word.at(-1)?.toLowerCase();
+	const current = normalize(word);
+	if (letter && letter !== current[0]) {
+		await reject(
+			`${
+				constants.emojis.statuses.no
+			} ${message.author.toString()} **Wrong letter!** ${inlineCode(
 				current,
-			)} is not a word. (language: ${language.name})`,
+			)} does not start with ${inlineCode(letter.toUpperCase())}, which ${inlineCode(
+				latest.word,
+			)} ends with.`,
 		);
 		return;
 	}
@@ -122,29 +138,13 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		return;
 	}
 
-	const latest = await Word.findOne({ channel: message.channel.id })
-		.sort({ createdAt: -1 })
-		.exec();
-
-	if (latest?.author === message.author.id) {
+	if (!(await isWord(current, language))) {
 		await reject(
 			`${
 				constants.emojis.statuses.no
-			} ${message.author.toString()} **You can’t send two words in a row!**`,
-		);
-		return;
-	}
-
-	const letter = latest && latest.word.at(-1)?.toLowerCase();
-	if (letter && letter !== current[0]) {
-		await reject(
-			`${
-				constants.emojis.statuses.no
-			} ${message.author.toString()} **Wrong letter!** ${inlineCode(
+			} ${message.author.toString()} **Unknown word!** ${inlineCode(
 				current,
-			)} does not start with ${inlineCode(letter.toUpperCase())}, which ${inlineCode(
-				latest.word,
-			)} ends with.`,
+			)} is not a word. (language: ${language.name})`,
 		);
 		return;
 	}
