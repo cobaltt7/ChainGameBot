@@ -125,9 +125,13 @@ export async function isWord(word: string, language: Language): Promise<boolean>
 			)
 		)
 			continue;
-		return metadata.parse.sections.some(
-			(section) => section.level === "2" && section.line === language.name,
-		);
+
+		if (
+			metadata.parse.sections.some(
+				(section) => section.level === "2" && section.line === language.name,
+			)
+		)
+			return true;
 	}
 
 	return false;
