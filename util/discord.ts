@@ -458,9 +458,10 @@ export async function tryReact(
 	emoji: EmojiIdentifierResolvable,
 ): Promise<MessageReaction | undefined> {
 	const { channel } = message;
-	if (channel.isDMBased()) return;
-	const permissions = channel.permissionsFor(client.user);
-	if (!permissions?.has(PermissionFlagsBits.AddReactions)) return;
+	const permissions =
+		channel.isDMBased()
+		|| channel.permissionsFor(client.user)?.has(PermissionFlagsBits.AddReactions);
+	if (!permissions) return;
 	try {
 		return await message.react(emoji);
 	} catch (error) {
