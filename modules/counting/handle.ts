@@ -1,6 +1,6 @@
-import type { Message } from "discord.js";
+import type { Message, PartialMessage, TextBasedChannel } from "discord.js";
 
-import { channelMention, hyperlink, inlineCode } from "discord.js";
+import { channelMention, hyperlink, inlineCode, userMention } from "discord.js";
 import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
@@ -90,4 +90,45 @@ export default async function handleCounting(message: Message): Promise<void> {
 		.updateOne({ lastNumber: next, lastAuthor: message.author.id, lastId: message.id })
 		.exec();
 	await tryReact(message, "👍");
+}
+
+export async function handleEdit(_: Message | PartialMessage, message: Message): Promise<void> {
+	const config = await Counting.findOne({
+		channel: message.channel.id,
+		lastId: message.id,
+	}).exec();
+	if (!config) return;
+
+	if (parseNumber(message.content, config.base) === config.lastNumber) return;
+
+	await resendDeleted(config, message.channel);
+
+	const deleted = message.deletable && (await message.delete().catch(() => void 0));
+	if (!deleted) await tryReact(message, constants.emojis.statuses.no);
+}
+export async function handleDelete(message: Message | PartialMessage): Promise<void> {
+	const config = await Counting.findOne({
+		channel: message.channel.id,
+		lastMessage: message.id,
+	}).exec();
+	if (!config) return;
+
+	await resendDeleted(config, message.channel);
+}
+
+async function resendDeleted(
+	config: InstanceType<typeof Counting>,
+	channel: TextBasedChannel,
+): Promise<void> {
+	if (!channel.isSendable()) return;
+
+	const message = await channel.send(
+		config.lastAuthor ?
+			`*${config.lastNumber.toLocaleString()} - ${userMention(config.lastAuthor)}*`
+		:	`*${config.lastNumber.toLocaleString()}*`,
+	);
+	await tryReact(message, "👍");
+
+	config.lastId = message.id;
+	await config.save();
 }
