@@ -1,4 +1,4 @@
-import type { Message } from "discord.js";
+import type { Message, PartialMessage, TextBasedChannel } from "discord.js";
 
 import { channelMention, hyperlink, inlineCode, messageLink, userMention } from "discord.js";
 import { client, stripMarkdown } from "strife.js";
@@ -156,4 +156,38 @@ export default async function handleWordChain(message: Message): Promise<void> {
 		word: current,
 	}).save();
 	await tryReact(message, "👍");
+}
+
+export async function handleEdit(_: Message | PartialMessage, message: Message): Promise<void> {
+	const last = await Word.findOne({ channel: message.channel.id }).sort({ createdAt: -1 }).exec();
+	if (last?.id !== message.id) return;
+
+	const current = normalize(stripMarkdown(message.cleanContent.normalize("NFC")));
+	if (current === last.word) return;
+
+	await resendDeleted(last, message.channel);
+
+	const deleted = message.deletable && (await message.delete().catch(() => void 0));
+	if (!deleted) await tryReact(message, constants.emojis.statuses.no);
+}
+export async function handleDelete(message: Message | PartialMessage): Promise<void> {
+	const last = await Word.findOne({ channel: message.channel.id }).sort({ createdAt: -1 }).exec();
+	if (last?.id !== message.id) return;
+
+	await resendDeleted(last, message.channel);
+}
+
+async function resendDeleted(
+	last: InstanceType<typeof Word>,
+	channel: TextBasedChannel,
+): Promise<void> {
+	if (!channel.isSendable()) return;
+
+	const message = await channel.send(
+		last.author ? `*${last.word} - ${userMention(last.author)}*` : `*${last.word}*`,
+	);
+	await tryReact(message, "👍");
+
+	last.id = message.id;
+	await last.save();
 }

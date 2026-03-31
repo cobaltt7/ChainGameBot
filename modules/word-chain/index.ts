@@ -9,7 +9,7 @@ import configWordChain, {
 	resetChannelModal,
 	setLastLetter,
 } from "./config.ts";
-import handleWordChain from "./handle.ts";
+import handleWordChain, { handleDelete, handleEdit } from "./handle.ts";
 
 defineChatCommand(
 	{
@@ -82,3 +82,6 @@ defineModal("setLastLetter", setLastLetter);
 defineButton("resetChannel", resetChannelConfirm);
 defineButton("resetChannelConfirmed", resetChannelModal);
 defineModal("resetChannel", resetChannel);
+
+defineEvent("messageUpdate", handleEdit);
+defineEvent("messageDelete", handleDelete);
