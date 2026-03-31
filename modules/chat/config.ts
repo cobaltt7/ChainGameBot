@@ -5,7 +5,7 @@ import assert from "node:assert";
 import { channelMention } from "discord.js";
 
 import constants from "../../common/constants.ts";
-import { ChatConfig } from "./misc.ts";
+import { ChatConfig, deprecationMessage } from "./misc.ts";
 
 export default async function configChat(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,
@@ -21,10 +21,11 @@ export default async function configChat(
 
 	await interaction.reply({
 		content:
-			config.enabled ?
+			(config.enabled ?
 				config.channel ?
 					`${constants.emojis.statuses.yes} CGB Chat is currently enabled, tracking all public channels, and responding in ${channelMention(config.channel)}.`
 				:	`${constants.emojis.statuses.no} CGB Chat is currently enabled and tracking all public channels, but no chat channel is configured.`
-			:	`${constants.emojis.statuses.no} CGB Chat is currently disabled in this server.`,
+			:	`${constants.emojis.statuses.no} CGB Chat is currently disabled in this server.`)
+			+ deprecationMessage,
 	});
 }

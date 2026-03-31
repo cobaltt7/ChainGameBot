@@ -1,26 +1,21 @@
-import type {
-	InteractionResponse,
-	Message,
-	MessageContextMenuCommandInteraction,
-	Snowflake,
-} from "discord.js";
+import type { InteractionResponse, Message, MessageContextMenuCommandInteraction, Snowflake } from "discord.js";
+
+
 
 import assert from "node:assert";
 
+
+
 import didYouMean, { ReturnTypeEnums, ThresholdTypeEnums } from "didyoumean2";
-import {
-	ChannelType,
-	ComponentType,
-	MessageFlags,
-	MessageType,
-	PermissionFlagsBits,
-	TextInputStyle,
-} from "discord.js";
+import { ChannelType, ComponentType, MessageFlags, MessageType, PermissionFlagsBits, TextInputStyle } from "discord.js";
 import { client, getBaseChannel } from "strife.js";
 
+
+
 import constants from "../../common/constants.ts";
-import { Chat, ChatConfig, ChatConsent } from "./misc.ts";
+import { Chat, ChatConfig, ChatConsent, deprecationMessage } from "./misc.ts";
 import { postProcessResponse, preProcessResponse, processPrompt } from "./process.ts";
+
 
 export default async function sendChat(message: Message<true>): Promise<string | undefined> {
 	if (
@@ -136,8 +131,9 @@ export async function removeResponse(
 		response,
 	}).exec();
 	await modalInteraction.editReply(
-		deletedCount ?
+		(deletedCount ?
 			`${constants.emojis.statuses.yes} Deleted ${deletedCount.toLocaleString()} prompts with that response.`
-		:	`${constants.emojis.statuses.no} Could not find that as a response to any prompt.`,
+		:	`${constants.emojis.statuses.no} Could not find that as a response to any prompt.`)
+			+ deprecationMessage,
 	);
 }

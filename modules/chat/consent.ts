@@ -17,7 +17,7 @@ import {
 import { client } from "strife.js";
 
 import constants from "../../common/constants.ts";
-import { ChatConsent } from "./misc.ts";
+import { ChatConsent, deprecationMessage } from "./misc.ts";
 
 async function getSettings(user: User): Promise<string> {
 	const consent = await ChatConsent.findOne({ user: user.id }).exec();
@@ -78,8 +78,10 @@ export async function showConsent(interaction: ChatInputCommandInteraction): Pro
 					{
 						type: ComponentType.TextDisplay,
 						content:
-							"CGB Chat learns by tracking messages across all channels. Any stored messages may be regurgitated, but only in the server you sent it in. Messages will never be sent cross-server.\n"
-							+ "Your messages will only be stored if you give explicit permission using the button below. You will be able to change your preference at any time, however any past messages can’t be deleted, as message authors are not stored. By default, your messages are not saved.",
+							`CGB Chat learns by tracking messages across all channels. Any stored messages may be regurgitated, but only in the server you sent it in. Messages will never be sent cross-server.\n`
+							+ `Your messages will only be stored if you give explicit permission using the button below. You will be able to change your preference at any time, however any past messages can’t be deleted, as message authors are not stored. By default, your messages are not saved.${
+								deprecationMessage
+							}`,
 					},
 					{
 						type: ComponentType.Separator,
@@ -120,7 +122,7 @@ export async function chatConsent(interaction: ButtonInteraction, type: string):
 		components: [
 			{
 				type: ComponentType.TextDisplay,
-				content: `${constants.emojis.statuses.yes} Updated settings!`,
+				content: `${constants.emojis.statuses.yes} Updated settings!${deprecationMessage}`,
 			},
 			{ type: ComponentType.TextDisplay, content: "## Current Settings" },
 			{ type: ComponentType.TextDisplay, content: await getSettings(interaction.user) },

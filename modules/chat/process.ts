@@ -32,6 +32,7 @@ import {
 
 import { GlobalBotInvitesPattern, messageToText } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
+import { deprecationMessage } from "./misc.ts";
 
 const defaultUser = userMention("0");
 const defaultChannel = channelMention("0");
@@ -117,7 +118,7 @@ export async function postProcessResponse(response: string, author: GuildMember)
 	const noChannels = await replaceChannels(noUsers, author.guild);
 	const noRoles = await replaceRoles(noChannels, author.guild);
 	const noEmojis = await replaceEmojis(noRoles, author.guild);
-	return noEmojis;
+	return noEmojis + deprecationMessage;
 }
 
 async function replaceChannels(response: string, guild: Guild): Promise<string> {

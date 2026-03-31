@@ -25,3 +25,8 @@ export const ChatConsent = model(
 		guilds: { type: Map, of: Boolean, default: {} },
 	}),
 );
+
+export const deprecationMessage =
+	"\n\n**CGB Chat will be removed soon.**"
+	+ " Due to low usage, high memory use, and privacy and performance concerns, CGB Chat will be removed in the coming months."
+	+ " If you still actively use CGB Chat, please reach out in the support server (linked in my bio).";
