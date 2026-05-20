@@ -56,10 +56,9 @@ const languageIndex = await fetch(
 				});
 			return JSON.parse(response.expandtemplates.wikitext) as Record<string, string>;
 		} catch (error) {
-			// TODO: use SuppressedError
-			throw new AggregateError([error], "Error parsing `expandtemplates` API result", {
-				cause: text,
-			});
+			error.text = text;
+			error.api = "expandtemplates";
+			throw error;
 		}
 	});
 const languageList = Object.entries(languageIndex).map(([code, name]): [string, Language] => [
@@ -86,10 +85,9 @@ export async function isWord(word: string, language: Language): Promise<boolean>
 			try {
 				return JSON.parse(text) as WiktionaryQueryPrefixsearchResult | WiktionaryError;
 			} catch (error) {
-				// TODO: use SuppressedError
-				throw new AggregateError([error], "Error parsing `parse` API result", {
-					cause: text,
-				});
+				error.text = text;
+				error.api = "query";
+				throw error;
 			}
 		});
 	if ("error" in search) return false;
@@ -111,10 +109,9 @@ export async function isWord(word: string, language: Language): Promise<boolean>
 				try {
 					return JSON.parse(text) as WiktionaryParseResult | WiktionaryError;
 				} catch (error) {
-					// TODO: use SuppressedError
-					throw new AggregateError([error], "Error parsing `parse` API result", {
-						cause: text,
-					});
+					error.text = text;
+					error.api = "parse";
+					throw error;
 				}
 			});
 		if ("error" in metadata) continue;
