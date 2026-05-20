@@ -51,7 +51,7 @@ export async function handleOujia(message: Message): Promise<void> {
 	if (config?.react) await tryReact(message, "👍");
 
 	if (character === true) {
-		await ouija.deleteOne();
+		await ouija.deleteOne().exec();
 		if (message.channel.sendable)
 			await message.channel.send(
 				`## ${userMention(ouija.owner)} wants to know: __${escapeAllMarkdown(
