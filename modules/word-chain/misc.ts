@@ -56,8 +56,7 @@ const languageIndex = await fetch(
 				});
 			return JSON.parse(response.expandtemplates.wikitext) as Record<string, string>;
 		} catch (error) {
-			error.text = text;
-			error.api = "expandtemplates";
+			if (Error.isError(error) && !error.cause) error.cause = text;
 			throw error;
 		}
 	});
@@ -85,8 +84,7 @@ export async function isWord(word: string, language: Language): Promise<boolean>
 			try {
 				return JSON.parse(text) as WiktionaryQueryPrefixsearchResult | WiktionaryError;
 			} catch (error) {
-				error.text = text;
-				error.api = "query";
+				if (Error.isError(error) && !error.cause) error.cause = text;
 				throw error;
 			}
 		});
@@ -109,8 +107,7 @@ export async function isWord(word: string, language: Language): Promise<boolean>
 				try {
 					return JSON.parse(text) as WiktionaryParseResult | WiktionaryError;
 				} catch (error) {
-					error.text = text;
-					error.api = "parse";
+					if (Error.isError(error) && !error.cause) error.cause = text;
 					throw error;
 				}
 			});
