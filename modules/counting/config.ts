@@ -1,29 +1,20 @@
-import type {
-	ButtonInteraction,
-	ChatInputCommandInteraction,
-	GuildTextBasedChannel,
-	ModalSubmitInteraction,
-	Snowflake,
-} from "discord.js";
+import type { ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, ModalSubmitInteraction, Snowflake } from "discord.js";
+
+
 
 import assert from "node:assert";
 
-import {
-	ButtonStyle,
-	channelMention,
-	ComponentType,
-	hyperlink,
-	inlineCode,
-	MessageFlags,
-	messageLink,
-	TextInputStyle,
-	userMention,
-} from "discord.js";
+
+
+import { ButtonStyle, channelMention, ComponentType, hyperlink, inlineCode, MessageFlags, messageLink, TextInputStyle, userMention } from "discord.js";
+
+
 
 import constants from "../../common/constants.ts";
 import { displayLogChannel } from "../../common/misc.ts";
 import { assertSendable, tryReact } from "../../util/discord.ts";
 import { Counting, parseNumber, stringifyNumber } from "./misc.ts";
+
 
 export default async function configCounting(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,
@@ -42,7 +33,7 @@ export default async function configCounting(
 	const config = await Counting.findOneAndUpdate(
 		{ channel: newConfig.channel.id },
 		{ ...newConfig, channel: newConfig.channel.id, logs: newConfig.logs?.id },
-		{ new: true, upsert: true, setDefaultsOnInsert: true },
+		{ returnDocument: "after", upsert: true, setDefaultsOnInsert: true },
 	).exec();
 
 	const lastLink =

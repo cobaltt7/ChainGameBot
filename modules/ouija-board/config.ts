@@ -1,11 +1,18 @@
 import type { ChatInputCommandInteraction, ForumChannel, MediaChannel } from "discord.js";
 
+
+
 import assert from "node:assert";
+
+
 
 import { channelMention, ComponentType, inlineCode, MessageFlags } from "discord.js";
 
+
+
 import constants from "../../common/constants.ts";
 import { OuijaBoardConfig } from "./misc.ts";
+
 
 export default async function configOuijaBoard(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,
@@ -26,7 +33,7 @@ export default async function configOuijaBoard(
 			// eslint-disable-next-line unicorn/string-content
 			complete: newConfig.complete?.replaceAll("`", "'"),
 		},
-		{ new: true, upsert: true, setDefaultsOnInsert: true },
+		{ returnDocument: "after", upsert: true, setDefaultsOnInsert: true },
 	).exec();
 
 	await interaction.reply({

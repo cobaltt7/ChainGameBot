@@ -1,32 +1,22 @@
-import type {
-	ApplicationCommandOptionChoiceData,
-	AutocompleteInteraction,
-	ButtonInteraction,
-	ChatInputCommandInteraction,
-	GuildTextBasedChannel,
-	ModalSubmitInteraction,
-	Snowflake,
-} from "discord.js";
+import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, ModalSubmitInteraction, Snowflake } from "discord.js";
+
+
 
 import assert from "node:assert";
 
-import {
-	ButtonStyle,
-	channelMention,
-	ComponentType,
-	hyperlink,
-	MessageFlags,
-	messageLink,
-	TextInputStyle,
-	userMention,
-} from "discord.js";
+
+
+import { ButtonStyle, channelMention, ComponentType, hyperlink, MessageFlags, messageLink, TextInputStyle, userMention } from "discord.js";
 import { matchSorter } from "match-sorter";
+
+
 
 import constants from "../../common/constants.ts";
 import { displayLogChannel } from "../../common/misc.ts";
 import { assertSendable, tryReact } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
 import { formatLanguageName, languages, wikiSearchOptions, Word, WordChainConfig } from "./misc.ts";
+
 
 export default async function configWordChain(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,
@@ -44,7 +34,7 @@ export default async function configWordChain(
 	const config = await WordChainConfig.findOneAndUpdate(
 		{ channel: newConfig.channel.id },
 		{ ...newConfig, channel: newConfig.channel.id, logs: newConfig.logs?.id },
-		{ new: true, upsert: true, setDefaultsOnInsert: true },
+		{ returnDocument: "after", upsert: true, setDefaultsOnInsert: true },
 	).exec();
 
 	const latest = await Word.findOne({ channel: config.channel }).sort({ createdAt: -1 }).exec();
