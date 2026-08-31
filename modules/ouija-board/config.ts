@@ -1,18 +1,11 @@
 import type { ChatInputCommandInteraction, ForumChannel, MediaChannel } from "discord.js";
 
-
-
 import assert from "node:assert";
-
-
 
 import { channelMention, ComponentType, inlineCode, MessageFlags } from "discord.js";
 
-
-
 import constants from "../../common/constants.ts";
 import { OuijaBoardConfig } from "./misc.ts";
-
 
 export default async function configOuijaBoard(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,

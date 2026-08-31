@@ -1,22 +1,32 @@
-import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, ButtonInteraction, ChatInputCommandInteraction, GuildTextBasedChannel, ModalSubmitInteraction, Snowflake } from "discord.js";
-
-
+import type {
+	ApplicationCommandOptionChoiceData,
+	AutocompleteInteraction,
+	ButtonInteraction,
+	ChatInputCommandInteraction,
+	GuildTextBasedChannel,
+	ModalSubmitInteraction,
+	Snowflake,
+} from "discord.js";
 
 import assert from "node:assert";
 
-
-
-import { ButtonStyle, channelMention, ComponentType, hyperlink, MessageFlags, messageLink, TextInputStyle, userMention } from "discord.js";
+import {
+	ButtonStyle,
+	channelMention,
+	ComponentType,
+	hyperlink,
+	MessageFlags,
+	messageLink,
+	TextInputStyle,
+	userMention,
+} from "discord.js";
 import { matchSorter } from "match-sorter";
-
-
 
 import constants from "../../common/constants.ts";
 import { displayLogChannel } from "../../common/misc.ts";
 import { assertSendable, tryReact } from "../../util/discord.ts";
 import { normalize } from "../../util/text.ts";
 import { formatLanguageName, languages, wikiSearchOptions, Word, WordChainConfig } from "./misc.ts";
-
 
 export default async function configWordChain(
 	interaction: ChatInputCommandInteraction<"cached" | "raw">,
